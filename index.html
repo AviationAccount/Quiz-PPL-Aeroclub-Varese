@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz PPL</title>
+    <style>
+        /* Stili per l'icona della bandierina */
+        .flag-icon {
+            font-size: 30px; /* Imposta la dimensione dell'emoji (bandierina) */
+            cursor: pointer; /* Cambia il cursore a "mano" quando il mouse è sopra l'icona */
+            transition: all 0.5s ease; /* Transizione fluida per l'animazione */
+        }
+        h2 {
+            color: #000000; /* Imposta il colore del testo a nero */
+        }
+        /* Evidenzia il pulsante della domanda corrente */
+        button.current {
+            background-color: #f39c12; /* Colore di sfondo arancione */
+            color: white; /* Colore del testo */
+            border: 2px solid #e67e22; /* Bordo arancione scuro */
+        }
+        /* Effetto hover */
+        .flag-icon:hover {
+            transform: scale(1.2); /* Aumenta la dimensione per evidenziare l'icona */
+            color: #ff0000; /* Cambia il colore dell'icona a rosso quando il mouse ci passa sopra */
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2); /* Aggiungi un'ombra per l'effetto di evidenza */
+        }
+        .passed {
+            color: green; /* Verde superato */
+        }
+        .not-passed {
+            color: red; /* Rosso non superato */
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(120deg, #6a11cb, #2575fc);
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .quiz-container {
+            max-width: 950px;
+            width: 90%;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            animation: fadeIn 1s ease;
+            display: flex;
+            flex-direction: column;
+            transform: scale(0);
+            animation: zoomIn 1s forwards;
+        }
+        @keyframes zoomIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .question {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+            text-align: center;
+            color: #333;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .question-number {
+            font-size: 1.2em;
+            color: #007bff;
+            margin-bottom: 2px;
+            text-align: center;
+        }
+
+        .options {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .options button {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            font-size: 1.1em;
+            border: 2px solid #007bff;
+            background: #f0f8ff;
+            color: #333;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left; /* Aggiungi questa regola per giustificare a sinistra */
+            width: 100%; /* Assicurati che il bottone prenda tutta la larghezza disponibile */
+            padding-left: 10px; /* Aggiungi un po' di padding a sinistra per evitare che il testo tocchi il bordo */
+            transition: transform 0.2s, background-color 0.3s, box-shadow 0.3s ease;
+        }
+
+        .options button .letter {
+            font-weight: bold;
+            margin-right: 12px;
+            color: #007bff;
+        }
+
+        .options button:hover {
+            background-color: #007bff;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 18px rgba(0, 123, 255, 0.3);
+        }
+
+        .options button.correct {
+            background-color: #28a745 !important;
+            color: white;
+        }
+
+        .options button.incorrect {
+            background-color: #dc3545 !important;
+            color: white;
+        }
+
+        .progress {
+            margin: 5px 0;
+            text-align: center;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+
+        .navigation-buttons button {
+            padding: 12px 20px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            transition: 0.3s;
+        }
+
+        .navigation-buttons button:hover {
+            background-color: #0056b3;
+        }
+
+        .navigation-buttons button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .home-button {
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 1.2em;
+            color: white;
+            background-color: #28a745;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .home-button:hover {
+            background-color: #218838;
+        }
+
+        .result {
+            font-size: 1.8em;
+            text-align: center;
+            margin-top: 20px;
+            color: black; /* colore del testo a nero */
+        }
+
+        .result h3 {
+            margin-top: 20px;
+            color: #007bff;
+        }
+
+        .result ul {
+            text-align: left;
+            margin: 0 auto;
+            max-width: 400px; /* Limita la larghezza per una migliore leggibilità */
+            padding-left: 20px; /* Aggiungi un po' di rientro */
+        }
+
+        .result li {
+            margin-bottom: 8px;
+            font-size: 1em;
+            color: #555;
+        }
+
+        .correct-count {
+            color: #28a745;
+        }
+
+        .incorrect-count {
+            color: #dc3545;
+        }
+        .flagged-count {
+            color: #FFA500; /* Colore arancione */
+
+        }
+
+        .filter-container {
+            text-align: center;
+            margin-bottom: 2px;
+            color: black;
+        }
+
+        select {
+            padding: 10px;
+            font-size: 1.1em;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            background-color: #f0f8ff;
+            margin-top: 5px;
+        }
+
+        .navigator {
+            overflow-x: scroll;
+            white-space: nowrap;
+            margin-top: 2px;
+            padding: 15px 0;
+            width: 100%;
+            background-color: transparent;
+            border-radius: 8px;
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+        }
+
+        .navigator button {
+            padding: 12px;
+            font-size: 1.1em;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            min-width: 45px;
+            height: 45px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .navigator button.correct {
+            background-color: #28a745;
+        }
+
+        .navigator button.incorrect {
+            background-color: #dc3545;
+        }
+
+        .navigator button.disabled {
+            background-color: #ccc;
+        }
+
+        .navigator button.flagged {
+            background-color: #f39c12;
+        }
+        .navigator button.current {
+            border: 4px solid #007fff;;
+        }
+        /* Stile per la modalità esame nel navigatore (risposta data) */
+        .navigator button.answered-exam {
+            background-color: #003366;
+        }
+        /* Nuovo stile per l'opzione selezionata dall'utente in modalità esame */
+        .options button.selected-exam-answer {
+            background-color: #003366; /* Blu scuro per evidenziare */
+            color: white;
+            border: 2px solid #001a33;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Login page styles */
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: transparent;
+        }
+
+        .login-box {
+            background-color: #ffffff;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            height: auto;
+            text-align: center;
+        }
+
+
+        .login-logo {
+            width: 200px;
+            height: auto;
+            margin-bottom: 5px;
+        }
+
+        .login-box input {
+            margin: 10px 0;
+            padding: 10px;
+            width: 90%;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+        }
+
+        .login-box button {
+            padding: 12px;
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .login-box button:hover {
+            background-color: #0056b3;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 1.2em;
+            display: none;
+        }
+        .updated-date {
+            color: #d3d3d3; /* Grigio chiaro */
+            font-size: 0.9em; /* Per renderlo meno prominente */
+            font-style: italic; /* Opzionale, per farlo sembrare meno visibile */
+        }
+
+        /* Stili per il modal di aggiornamento */
+        .update-modal {
+            display: none; /* Nascosto di default */
+            position: fixed; /* Posizionamento fisso */
+            z-index: 1000; /* Sopra tutti gli altri elementi */
+            left: 0;
+            top: 0;
+            width: 100%; /* Larghezza intera */
+            height: 100%; /* Altezza intera */
+            overflow: auto; /* Abilita lo scroll se necessario */
+            background-color: rgba(0, 0, 0, 0.6); /* Sfondo semi-trasparente */
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px); /* Effetto sfocatura sullo sfondo */
+        }
+
+        .update-modal-content {
+            background-color: #ffffff;
+            margin: auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+            color: #333;
+            transform: translateY(-50px);
+            opacity: 0;
+            animation: slideInModal 0.5s forwards cubic-bezier(0.2, 0.8, 0.2, 1.0);
+        }
+
+        @keyframes slideInModal {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .update-modal-content h3 {
+            color: #007bff;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .update-modal-content p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .update-modal-content button {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .update-modal-content button:hover {
+            background-color: #218838;
+        }
+
+        /* Stili per il grafico a barre */
+        .chart-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 100px; /* Altezza fissa per il grafico */
+            width: 80%;
+            margin: 20px auto;
+            border-bottom: 1px solid #ccc;
+            gap: 10px;
+        }
+
+        .bar {
+            width: 40%; /* Larghezza delle barre */
+            color: white;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px 5px 0 0;
+            transition: height 0.5s ease-out;
+        }
+
+        .bar-correct {
+            background-color: #28a745;
+        }
+
+        .bar-incorrect {
+            background-color: #dc3545;
+        }
+
+        .incorrect-questions-list {
+            margin-top: 20px;
+            max-height: 150px; /* Altezza massima per lo scroll */
+            overflow-y: auto; /* Abilita lo scroll verticale */
+            border: 1px solid #eee;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+        .incorrect-questions-list h4 {
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .incorrect-questions-list ul {
+            list-style-type: decimal; /* Numerazione delle domande */
+            padding-left: 20px;
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        .incorrect-questions-list li {
+            margin-bottom: 5px;
+        }
+
+        /* Stili per la selezione della modalità */
+        .mode-selection-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+            color: black;
+            text-align: center;
+        }
+
+        .mode-selection-container button {
+            padding: 15px 30px;
+            font-size: 1.3em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            transition: background-color 0.3s, transform 0.2s;
+            min-width: 200px; /* Larghezza minima per i pulsanti */
+        }
+
+        .mode-selection-container button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        .mode-selection-container button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="login" class="login-container">
+        <div class="login-box">
+            <img src="https://i.ibb.co/7d1dv94j/Senza-titolo-2.jpg alt="Logo sito quiz ppl"/>
+            <h2>Login</h2>
+            <input type="text" id="username" placeholder="Username" />
+            <input type="password" id="password" placeholder="Password" />
+            <button onclick="login()">Accedi</button>
+            <div id="error-message" class="error-message">Username o password errati</div>
+        </div>
+    </div>
+
+    <div id="quiz-section" class="quiz-container" style="display: none;">
+        <div class="download-section">
+            <a href="https://drive.google.com/file/d/1Q_-1z_xR2OjHL8st6d3wFzQWgWHZVSCZ/view?usp=drive_link">
+                <span class="download-icon">📑</span> Scarica qui gli allegati per i quiz
+            </a>
+        </div>
+        <div id="filter-and-mode-selection">
+            <div class="filter-container">
+                <label for="subject-select">Seleziona la materia: </label>
+                <select id="subject-select">
+                    <option value="">Seleziona qui la materia ➡️</option>
+                    <option value="Regolamentazione">Regolamentazione</option>
+                    <option value="Principi del Volo">Principi del Volo</option>
+                    <option value="Nozioni generali">Nozioni generali</option>
+                    <option value="Comunicazioni ita">Comunicazioni ita</option>
+                    <option value="Comunicazioni ing">Comunicazioni ing</option>
+                    <option value="Navigazione">Navigazione</option>
+                    <option value="Meteorologia">Meteorologia</option>
+                    <option value="Procedure operative">Procedure operative</option>
+                    <option value="Prestazioni e Pianificazione">Prestazioni e Pianificazione</option>
+                    <option value="Fattore umano">Fattore umano</option>
+                </select>
+            </div>
+            <!-- Nuova sezione per la selezione della modalità (Studio/Esame) -->
+            <div id="mode-selection-container" class="mode-selection-container" style="display: none;">
+                <h3>Scegli la modalità:</h3>
+                <button onclick="startQuiz('study')">Modalità Studio 📖</button>
+                <button id="examModeButton" onclick="startQuiz('exam')">Modalità Esame 🎓</button>
+            </div>
+        </div>
+
+        <div id="quiz" style="display: none;">
+            <div class="question-number" id="question-number"></div> <div id="question" class="question"></div>
+            <ul id="options" class="options"></ul>
+            <div class="progress">
+                Domande visualizzate : <span id="answered-questions">0</span> / <span id="total-questions">0</span><br>
+                Corrette: <span id="correct-answers" class="correct-count">0</span>, Errate: <span id="wrong-answers" class="incorrect-count">0</span>,<span id="flagged-questions"> Evidenziate: 0</span>
+            </div>
+            <div class="navigator" id="navigator"></div>
+            <div class="navigation-buttons">
+                <button id="prev" onclick="prevQuestion()" disabled>Indietro</button>
+                <button id="next" onclick="nextQuestion()">Avanti</button>
+                <button id="finish" onclick="finishQuiz()" style="display:none;">Termina Quiz</button>
+            </div>
+        </div>
+        <div id="result" class="result" style="display: none;">
+            <div id="result-message"></div>
+            <!-- Contenitore per il grafico -->
+            <div id="quiz-chart" class="chart-container"></div>
+            <!-- Contenitore per la lista delle domande errate -->
+            <div id="incorrect-questions-list" class="incorrect-questions-list"></div>
+            <button class="home-button" onclick="resetQuiz()">Home</button>
+        </div>
+    </div>
+
+    <!-- Modale per le notifiche di aggiornamento -->
+    <div id="update-notification-modal" class="update-modal">
+        <div class="update-modal-content">
+            <h3>Versione 1.2.0 </h3>
+           
+            <ul>
+                <li>Risolti bug di sistema.</li>
+                <li>Ora è possibile cambiare la risposta fornita in modalità esame.</li>
+<li>Corrette le risposte alle domande di differenti materia.</li>
+            </ul>
+            <p>Data ultimo aggiornamento: <span id="last-app-update-date-display"></span></p>
+            <button onclick="closeUpdateNotification()">Ho capito!</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script>
+        // Data dell'ultimo aggiornamento dell'applicazione (modifica questa data ad ogni aggiornamento significativo)
+        const LAST_APP_UPDATE_DATE = '2025-10-02'; // Formato YYYY-MM-DD
+
+        // Costanti per il numero di domande in modalità esame per ogni materia
+        const EXAM_QUESTION_COUNTS = {
+            "Regolamentazione": 20,
+            "Nozioni generali": 20, // Corrisponde a "Nozioni Generali sugli Aeromobili"
+            "Prestazioni e Pianificazione": 12,
+            "Fattore umano": 12,
+            "Meteorologia": 20,
+            "Navigazione": 20,
+            "Principi del Volo": 12,
+            "Procedure operative": 8,
+            "Comunicazioni ita": 8, // Comunicazioni in Italiano
+            "Comunicazioni ing": 8  // Comunicazioni in Inglese
+        };
+
+        // Login functionality
+        const validUsername = 'allievo';
+        const validPassword = 'allievo';
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === validUsername && password === validPassword) {
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('quiz-section').style.display = 'block';
+                // Assicurati che il container del filtro sia visibile al login per la prima selezione
+                document.querySelector('.filter-container').style.display = 'block';
+                document.getElementById('mode-selection-container').style.display = 'none'; // Nascondi la selezione modalità
+                document.getElementById('quiz').style.display = 'none'; // Assicurati che il quiz sia nascosto all'inizio
+                loadCSVData();
+                showUpdateNotification(); // Mostra la notifica dopo il login
+            } else {
+                document.getElementById('error-message').style.display = 'block';
+            }
+        }
+        // Aggiungi l'evento "Enter" sui campi di input
+        document.getElementById('username').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                login();
+            }
+        });
+
+        document.getElementById('password').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                login();
+            }
+        });
+
+        // Funzioni per la notifica di aggiornamento
+        function showUpdateNotification() {
+            const lastSeenUpdate = localStorage.getItem('lastSeenUpdateDate');
+
+            // Se l'utente non ha mai visto la notifica o l'app è stata aggiornata dopo l'ultima visualizzazione
+            if (!lastSeenUpdate || new Date(lastSeenUpdate) < new Date(LAST_APP_UPDATE_DATE)) {
+                document.getElementById('last-app-update-date-display').textContent = new Date(LAST_APP_UPDATE_DATE).toLocaleDateString('it-IT');
+                document.getElementById('update-notification-modal').style.display = 'flex'; // Mostra il modal
+            }
+        }
+
+        function closeUpdateNotification() {
+            document.getElementById('update-notification-modal').style.display = 'none'; // Nasconde il modal
+            localStorage.setItem('lastSeenUpdateDate', LAST_APP_UPDATE_DATE); // Salva la data dell'ultimo aggiornamento visto
+        }
+
+
+       // Quiz functionality
+// Quiz functionality
+let quizData = [];
+let filteredData = []; // Le domande effettivamente usate nel quiz corrente
+let currentQuestionIndex = 0;
+let correctAnswers = 0;
+let wrongAnswers = 0;
+let startTime = Date.now();
+let subjectResults = {}; // Oggetto per tenere traccia dei risultati per materia
+let currentQuizSubject = ''; // Per memorizzare la materia selezionata per il quiz corrente
+let incorrectQuestionDetails = []; // Per memorizzare i dettagli delle domande errate
+let quizMode = 'study'; // Nuova variabile per la modalità del quiz ('study' o 'exam')
+
+const questionElement = document.getElementById('question');
+const optionsElement = document.getElementById('options');
+const prevButton = document.getElementById('prev');
+const nextButton = document.getElementById('next');
+const finishButton = document.getElementById('finish');
+const answeredQuestions = document.getElementById('answered-questions');
+const totalQuestions = document.getElementById('total-questions');
+const correctAnswersElement = document.getElementById('correct-answers');
+const wrongAnswersElement = document.getElementById('wrong-answers');
+const navigatorElement = document.getElementById('navigator');
+const questionNumberElement = document.getElementById('question-number'); // Casella n domanda
+const subjectSelect = document.getElementById('subject-select');
+const examModeButton = document.getElementById('examModeButton'); // Ottieni il riferimento al pulsante
+let answeredQuestionsStatus = []; // Array per tracciare lo stato delle domande risposte
+let userAnswers = []; // Array per tracciare le risposte dell'utente
+let flaggedQuestions = []; // Array per tracciare le domande contrassegnate con flag
+
+// Funzione per mescolare un array (algoritmo Fisher-Yates)
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function loadCSVData() {
+    const csvFile = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7nj9UrBloRfIDxZkRUkxBu1neSuPIyaR4EjBWj90BLyDK3VkOBeqZSxe2pb1jwkE7mIEelHXhzayP/pub?output=csv';
+    Papa.parse(csvFile, {
+        download: true,
+        header: false,
+        dynamicTyping: true,
+        complete: function(results) {
+            quizData = results.data.map(row => ({
+                question: row[0],
+                options: [row[1], row[2], row[3], row[4]].filter(option => option),
+                correct: row[5],
+                questionNumber: row[6],
+                subject: row[7], // Aggiungi la materia
+                updateDate: row[8] //colonna I: data di aggiornamento della domanda
+            }));
+
+            // Conta le domande per materia e aggiorna il menu
+            const subjectCounts = {};
+            quizData.forEach(q => {
+                if (q.subject) {
+                    subjectCounts[q.subject] = (subjectCounts[q.subject] || 0) + 1;
+                }
+            });
+
+            // Aggiorna le option nel menu a tendina con il conteggio
+            const subjectSelect = document.getElementById('subject-select');
+            Array.from(subjectSelect.options).forEach(option => {
+                const subject = option.value;
+                if (subjectCounts[subject]) {
+                    option.textContent = `${subject} (${subjectCounts[subject]})`;
+                }
+            });
+        }
+    });
+}
+
+// Funzione chiamata quando la materia viene selezionata
+function handleSubjectSelection() {
+    const selectedSubject = subjectSelect.value;
+    currentQuizSubject = selectedSubject; // Aggiorna la materia corrente
+
+    document.getElementById('quiz').style.display = 'none'; // Assicurati che il quiz sia nascosto
+
+    if (selectedSubject) {
+        // Se una materia è stata selezionata, mostra i pulsanti di selezione modalità
+        document.querySelector('.filter-container').style.display = 'none'; // Nascondi il filtro
+        document.getElementById('mode-selection-container').style.display = 'flex'; // Mostra selezione modalità
+
+        // Abilita/Disabilita il pulsante "Modalità Esame"
+        if (typeof EXAM_QUESTION_COUNTS !== 'undefined' && EXAM_QUESTION_COUNTS[selectedSubject]) {
+            examModeButton.disabled = false;
+        } else {
+            examModeButton.disabled = true;
+        }
+
+        // In modalità studio, il numero totale di domande sarà tutte quelle della materia
+        const questionsForSelectedSubject = quizData.filter(question => question.subject === selectedSubject);
+        totalQuestions.textContent = questionsForSelectedSubject.length;
+
+    } else {
+        // Se si torna all'opzione "Fai click per la lista materie", nascondi tutto tranne il filtro
+        document.getElementById('mode-selection-container').style.display = 'none';
+        document.querySelector('.filter-container').style.display = 'block';
+        // Reset del totalQuestions per mostrare il numero complessivo o 0
+        totalQuestions.textContent = 0;
+    }
+}
+subjectSelect.addEventListener('change', handleSubjectSelection);
+
+// Funzione per avviare il quiz in base alla modalità selezionata
+function startQuiz(mode) {
+    quizMode = mode; // Imposta la modalità del quiz
+
+    document.getElementById('mode-selection-container').style.display = 'none'; // Nascondi selezione modalità
+    document.getElementById('quiz').style.display = 'block'; // Mostra il quiz
+
+    // Prepara il pool di domande per la materia selezionata
+    let questionsPool = quizData.filter(question => question.subject === currentQuizSubject);
+
+    if (quizMode === 'exam') {
+        // Only shuffle for exam mode
+        questionsPool = shuffleArray(questionsPool);
+        const requiredCount = (typeof EXAM_QUESTION_COUNTS !== 'undefined') ? EXAM_QUESTION_COUNTS[currentQuizSubject] : null;
+
+        if (requiredCount !== undefined && requiredCount > 0) {
+            filteredData = questionsPool.slice(0, Math.min(requiredCount, questionsPool.length));
+        } else {
+            // Se non ci sono conteggi specifici per l'esame, usa tutte le domande disponibili per la materia
+            filteredData = questionsPool;
+            console.warn(`Nessun conteggio specifico per l'esame trovato per la materia: ${currentQuizSubject}. Utilizzando tutte le domande disponibili.`);
+        }
+    } else { // 'study' mode - no initial shuffling of questions, but options will be shuffled
+        filteredData = questionsPool; // Use questions in their original, loaded order
+    }
+
+    // Inizializza gli oggetti domanda per mantenere lo stato (shuffledOptions e correctAnswerIndexAfterShuffle)
+    filteredData = filteredData.map(q => ({
+        ...q,
+        shuffledOptions: q.shuffledOptions || null, // Mantiene lo stato se già presente (es. in reset parziale)
+        correctAnswerIndexAfterShuffle: q.correctAnswerIndexAfterShuffle || null 
+    }));
+
+
+    // Inizializza o resetta tutti i contatori e gli array di stato
+    currentQuestionIndex = 0;
+    correctAnswers = 0;
+    wrongAnswers = 0;
+    answeredQuestionsStatus = Array(filteredData.length).fill(undefined); // Inizializza con undefined
+    userAnswers = Array(filteredData.length).fill(undefined); // Inizializza con undefined
+    flaggedQuestions = [];
+    subjectResults = {};
+    incorrectQuestionDetails = [];
+    startTime = Date.now();
+
+    // Aggiorna la visualizzazione iniziale del progresso con il numero effettivo di domande del quiz
+    totalQuestions.textContent = filteredData.length;
+    updateProgress();
+    updateFlaggedCount();
+
+    showQuestion(); // Mostra la prima domanda
+}
+
+function showQuestion() {
+    const currentQuestion = filteredData[currentQuestionIndex];
+    if (!currentQuestion) return; // Assicurati che ci siano domande nella lista filtrata
+
+    questionElement.innerHTML = currentQuestion.question +
+        `<span class="flag-icon" onclick="toggleFlag(event)">🚩</span>`;
+    questionNumberElement.innerHTML = `Domanda ${currentQuestion.questionNumber} • <span class="updated-date">Aggiornata il ${currentQuestion.updateDate || 'N/D'}</span>`;
+    optionsElement.innerHTML = '';
+    const letters = ['A', 'B', 'C', 'D'];
+
+    let shuffledOptions = currentQuestion.shuffledOptions;
+    let newCorrectIndex = currentQuestion.correctAnswerIndexAfterShuffle;
+
+    // Se le opzioni non sono ancora state rimescolate e salvate, rimescola ORA e salva
+    if (!shuffledOptions) {
+        shuffledOptions = shuffleArray([...currentQuestion.options]);
+        const originalCorrectOption = currentQuestion.options[currentQuestion.correct];
+        newCorrectIndex = shuffledOptions.indexOf(originalCorrectOption);
+
+        // Salva l'ordine rimescolato e l'indice corretto per le visite future
+        currentQuestion.shuffledOptions = shuffledOptions;
+        currentQuestion.correctAnswerIndexAfterShuffle = newCorrectIndex;
+    }
+    
+    // Controlla lo stato di risposta
+    const userAnswer = userAnswers[currentQuestionIndex];
+
+    shuffledOptions.forEach((option, index) => {
+        const button = document.createElement('button');
+        button.innerHTML = `<span class="letter">${letters[index]}</span> ${option}`;
+        
+        // Per la modalità studio, i pulsanti devono essere disabilitati se è stata data una risposta
+        const isAnsweredStudy = quizMode === 'study' && userAnswer !== undefined;
+
+        if (isAnsweredStudy) {
+            button.disabled = true;
+
+            // APPLICAZIONE DELLA COLORAZIONE PER LA MODALITÀ STUDIO
+            if (newCorrectIndex === index) {
+                button.classList.add('correct');
+            }
+            if (userAnswer === index && userAnswer !== newCorrectIndex) {
+                button.classList.add('incorrect');
+            }
+        } else if (userAnswer === index) { 
+            // Modalità Esame o Studio (non ancora risposto/risposta modificabile): Evidenzia la risposta selezionata
+            button.classList.add('selected-exam-answer');
+        }
+        
+        // Assegna l'handler click. In modalità esame, si può sempre rispondere.
+        if (!isAnsweredStudy) {
+            button.onclick = () => checkAnswer(index, newCorrectIndex, shuffledOptions);
+        }
+
+        optionsElement.appendChild(button);
+    });
+
+    // Aggiorna il numero delle domande risposte
+    answeredQuestions.textContent = answeredQuestionsStatus.filter(a => a !== undefined).length;
+    
+    // In modalità studio, aggiorna i contatori. In modalità esame, no.
+    if (quizMode === 'study') {
+        correctAnswersElement.textContent = correctAnswers;
+        wrongAnswersElement.textContent = wrongAnswers;
+    } else {
+        // In modalità esame, i contatori rimangono a 0 durante il quiz
+        correctAnswersElement.textContent = 0;
+        wrongAnswersElement.textContent = 0;
+    }
+
+    updateNavigator();
+
+    if (currentQuestionIndex === filteredData.length - 1) {
+        nextButton.style.display = 'inline-block';
+        finishButton.style.display = 'inline-block';
+    } else {
+        nextButton.style.display = 'inline-block';
+        finishButton.style.display = 'inline-block';
+    }
+    prevButton.disabled = currentQuestionIndex === 0;
+}
+
+function updateNavigator() {
+    // Pulisci la barra di navigazione prima di aggiornare
+    navigatorElement.innerHTML = '';
+
+    // Crea i pulsanti solo per le domande filtrate
+    filteredData.forEach((question, index) => {
+        const button = document.createElement('button');
+        button.textContent = index + 1;
+        button.onclick = () => {
+            currentQuestionIndex = index;
+            showQuestion();
+        };
+
+        // Aggiungi le classi per le risposte
+        if (userAnswers[index] !== undefined) {
+            if (quizMode === 'study') {
+                // In modalità studio, mostra colore corretto/sbagliato
+                if (question.correctAnswerIndexAfterShuffle !== null && userAnswers[index] === question.correctAnswerIndexAfterShuffle) {
+                    button.classList.add('correct');
+                } else {
+                    button.classList.add('incorrect');
+                }
+            } else {
+                // In modalità esame, mostra solo "risposto" (blu)
+                button.classList.add('answered-exam');
+            }
+        } else {
+            button.classList.add('disabled');
+        }
+
+        // Aggiungi la classe 'flagged' se la domanda è stata segnalata
+        if (flaggedQuestions.includes(index)) {
+            button.classList.add('flagged');
+        }
+
+        // Evidenzia il pulsante della domanda corrente
+        if (index === currentQuestionIndex) {
+            button.classList.add('current');
+        }
+
+        // Aggiungi il pulsante alla barra
+        navigatorElement.appendChild(button);
+    });
+
+    // Scorri la barra per portare la domanda corrente in vista
+    const currentButton = navigatorElement.querySelector('.current');
+    if (currentButton) {
+        currentButton.scrollIntoView({
+            behavior: 'smooth', // Effetto di scorrimento fluido
+            inline: 'start', // Posiziona il pulsante all'inizio della barra
+            block: 'nearest'
+        });
+    }
+}
+
+function toggleFlag(event) { // Aggiunto 'event' come parametro
+    // Impedisce la propagazione del click all'elemento genitore
+    event.stopPropagation();
+
+    // Aggiungi o rimuovi il flag per la domanda corrente
+    if (flaggedQuestions.includes(currentQuestionIndex)) {
+        flaggedQuestions = flaggedQuestions.filter(index => index !== currentQuestionIndex); // Rimuove il flag
+    } else {
+        flaggedQuestions.push(currentQuestionIndex); // Aggiunge il flag
+    }
+
+    // Aggiorna il contatore delle domande flaggate
+    updateFlaggedCount();
+    updateNavigator();
+    
+    // In modalità studio, se la domanda non è ancora stata risposta, passa alla prossima domanda
+    if (quizMode === 'study' && userAnswers[currentQuestionIndex] === undefined) {
+        setTimeout(nextQuestion, 500); // Aggiunge un piccolo delay prima di passare alla domanda successiva
+    }
+}
+
+function updateFlaggedCount() {
+    // Conta le domande flaggate
+    const flaggedCount = flaggedQuestions.length;
+
+    // Mostra il numero di domande flaggate nell'elemento HTML
+    const flaggedElement = document.getElementById('flagged-questions');
+    flaggedElement.innerHTML = `Evidenziate: <span class="flagged-count">${flaggedCount}</span>`;
+}
+
+function updateProgress() {
+    answeredQuestions.textContent = userAnswers.filter(a => a !== undefined).length; // Conteggia solo le risposte date
+    totalQuestions.textContent = filteredData.length; // Totale delle domande filtrate
+    
+    // Aggiorna i contatori di corrette/errate solo in modalità studio
+    if (quizMode === 'study') {
+        correctAnswersElement.textContent = correctAnswers;
+        wrongAnswersElement.textContent = wrongAnswers;
+    } else {
+        // In modalità esame rimangono a zero fino alla fine
+        correctAnswersElement.textContent = 0;
+        wrongAnswersElement.textContent = 0;
+    }
+
+    // Aggiorna anche il numero delle domande flaggate
+    updateFlaggedCount();
+}
+
+function checkAnswer(selectedIndex, newCorrectIndex, shuffledOptions) {
+    const currentQuestion = filteredData[currentQuestionIndex];
+    const buttons = optionsElement.querySelectorAll('button');
+
+    // Memorizza la risposta dell'utente (l'indice nell'ordine mescolato)
+    userAnswers[currentQuestionIndex] = selectedIndex;
+    answeredQuestionsStatus[currentQuestionIndex] = selectedIndex; // Marca la domanda come risposta
+
+    // Rimuove e riapplica la classe di selezione per permettere il cambio di risposta (Modalità Esame)
+    buttons.forEach(button => button.classList.remove('selected-exam-answer', 'correct', 'incorrect'));
+    
+    const currentSubject = currentQuestion.subject;
+
+    // In modalità studio: Logica di correzione, disabilitazione e avanzamento immediato
+    if (quizMode === 'study') {
+        // Disabilita tutti i pulsanti delle opzioni non appena si risponde
+        buttons.forEach(button => button.disabled = true);
+        
+        if (!subjectResults[currentSubject]) {
+            subjectResults[currentSubject] = { correct: 0, wrong: 0, total: 0 };
+        }
+        subjectResults[currentSubject].total++;
+
+        // Controllo e incremento dei contatori (solo in modalità studio)
+        if (selectedIndex === newCorrectIndex) {
+            correctAnswers++;
+            subjectResults[currentSubject].correct++;
+            buttons[selectedIndex].classList.add('correct');
+        } else {
+            wrongAnswers++;
+            subjectResults[currentSubject].wrong++;
+            buttons[selectedIndex].classList.add('incorrect');
+            buttons[newCorrectIndex].classList.add('correct'); // Evidenzia la corretta
+            
+            // Aggiungi i dettagli della domanda errata (solo se è sbagliata in studio)
+            incorrectQuestionDetails.push({
+                questionNumber: currentQuestion.questionNumber,
+                subject: currentQuestion.subject,
+                questionText: currentQuestion.question,
+                userAnswerIndex: selectedIndex,
+                correctAnswerIndex: newCorrectIndex,
+                options: shuffledOptions
+            });
+        }
+        
+        // Se la domanda era flaggata, rimuovi il flag (solo se è stata data una risposta)
+        if (flaggedQuestions.includes(currentQuestionIndex)) {
+             flaggedQuestions = flaggedQuestions.filter(index => index !== currentQuestionIndex);
+        }
+
+        updateProgress();
+        updateNavigator();
+
+        // Passa alla domanda successiva dopo un breve ritardo se la risposta è corretta
+        if (selectedIndex === newCorrectIndex) {
+            setTimeout(nextQuestion, 1000); 
+        }
+        
+    } else { // Modalità esame: Registra solo la selezione senza correzione
+        // Evidenzia la nuova risposta selezionata
+        buttons[selectedIndex].classList.add('selected-exam-answer');
+        
+        // Se la domanda era flaggata, *non* rimuovere il flag (non è stata "risolta")
+        
+        updateProgress(); // Aggiorna il navigatore per mostrare che la domanda è stata risposto (pallino blu)
+        updateNavigator(); 
+    }
+}
+
+function nextQuestion() {
+    if (currentQuestionIndex < filteredData.length - 1) {
+        currentQuestionIndex++;
+        showQuestion();
+    }
+}
+
+function prevQuestion() {
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        showQuestion();
+    }
+}
+
+function finishQuiz() {
+    const endTime = Date.now();
+    const totalTimeSeconds = Math.round((endTime - startTime) / 1000);
+    const minutes = Math.floor(totalTimeSeconds / 60);
+    const seconds = totalTimeSeconds % 60;
+    const totalTimeFormatted = `${minutes} minuti e ${seconds} secondi`;
+
+    // *** NUOVA LOGICA: Ricalcola i risultati COMPLETI alla fine solo in modalità esame ***
+    if (quizMode === 'exam') {
+        correctAnswers = 0;
+        wrongAnswers = 0;
+        subjectResults = {};
+        incorrectQuestionDetails = [];
+        
+        filteredData.forEach((q, index) => {
+            const userAnswer = userAnswers[index];
+            if (userAnswer !== undefined) {
+                const currentSubject = q.subject;
+                if (!subjectResults[currentSubject]) {
+                    subjectResults[currentSubject] = { correct: 0, wrong: 0, total: 0 };
+                }
+                subjectResults[currentSubject].total++;
+                
+                // Confronta la risposta dell'utente con l'indice corretto salvato (che è già rimescolato)
+                if (userAnswer === q.correctAnswerIndexAfterShuffle) {
+                    correctAnswers++;
+                    subjectResults[currentSubject].correct++; 
+                } else {
+                    wrongAnswers++;
+                    subjectResults[currentSubject].wrong++;
+                    // Aggiungi i dettagli della domanda errata
+                    incorrectQuestionDetails.push({
+                        questionNumber: q.questionNumber,
+                        subject: q.subject,
+                        questionText: q.question,
+                        userAnswerIndex: userAnswer,
+                        correctAnswerIndex: q.correctAnswerIndexAfterShuffle,
+                        options: q.shuffledOptions 
+                    });
+                }
+            }
+        });
+    }
+
+    // Determina i dati per la visualizzazione
+    let displayCorrect = correctAnswers;
+    let displayWrong = wrongAnswers;
+    let displayTotal = filteredData.length;
+    let displaySubjectName = currentQuizSubject; 
+
+    const percentage = displayTotal > 0 ? Math.round((displayCorrect / displayTotal) * 100) : 0;
+    const resultMessage = percentage >= 75 ? "Quiz superato" : "Quiz non superato";
+    const quizOverallResultClass = percentage >= 75 ? "passed" : "not-passed";
+
+    // Nascondi il quiz e la sezione download, mostra i risultati
+    document.getElementById('quiz').style.display = 'none';
+    document.querySelector('.download-section').style.display = 'none';
+    document.getElementById('result').style.display = 'block';
+
+    let resultHtml = `
+        <p>Hai risposto correttamente a <span class="correct-count">${displayCorrect}</span> domande su <span class="total-questions">${displayTotal}</span> di ${displaySubjectName}.</p>
+        <p>Percentuale: ${percentage}%</p>
+        <p>Tempo impiegato: ${totalTimeFormatted}</p>
+        <strong class="${quizOverallResultClass}">${resultMessage}</strong>
+    `;
+
+    // --- Generazione del grafico ---
+    const chartContainer = document.getElementById('quiz-chart');
+    chartContainer.innerHTML = ''; 
+
+    if (displayTotal > 0) {
+        const correctHeight = (displayCorrect / displayTotal) * 100;
+        const incorrectHeight = (displayWrong / displayTotal) * 100;
+
+        const correctBar = document.createElement('div');
+        correctBar.classList.add('bar', 'bar-correct');
+        correctBar.style.height = `${correctHeight}%`;
+        correctBar.textContent = `${displayCorrect}`;
+
+        const incorrectBar = document.createElement('div');
+        incorrectBar.classList.add('bar', 'bar-incorrect');
+        incorrectBar.style.height = `${incorrectHeight}%`;
+        incorrectBar.textContent = `${displayWrong}`;
+
+        chartContainer.appendChild(correctBar);
+        chartContainer.appendChild(incorrectBar);
+    }
+
+    // --- Elenco domande errate ---
+    const incorrectQuestionsListDiv = document.getElementById('incorrect-questions-list');
+    incorrectQuestionsListDiv.innerHTML = ''; 
+
+    if (incorrectQuestionDetails.length > 0) {
+        let incorrectListHtml = `<h4>Domande Errate:</h4><ul>`;
+        // Ordina le domande errate per numero di domanda
+        incorrectQuestionDetails.sort((a, b) => a.questionNumber - b.questionNumber);
+
+        incorrectQuestionDetails.forEach(q => {
+            // Trova i dati originali della domanda per il testo completo delle opzioni
+            const originalQuestionEntry = quizData.find(item => item.questionNumber === q.questionNumber && item.subject === q.subject);
+            const correctOptionText = originalQuestionEntry ? originalQuestionEntry.options[originalQuestionEntry.correct] : 'N/D';
+            
+            // Per il testo della risposta dell'utente, usiamo le opzioni mescolate salvate in q.options e l'indice salvato in q.userAnswerIndex
+            const userAnswerText = q.options[q.userAnswerIndex]; 
+
+            incorrectListHtml += `<li>Domanda ${q.questionNumber} (${q.subject}): La tua risposta: "${userAnswerText}". Risposta corretta: "${correctOptionText}".</li>`;
+        });
+        incorrectListHtml += `</ul>`;
+        incorrectQuestionsListDiv.innerHTML = incorrectListHtml;
+    } else {
+        incorrectQuestionsListDiv.innerHTML = '<h4>Nessuna domanda errata! Ottimo lavoro!</h4>';
+    }
+
+    document.getElementById('result-message').innerHTML = resultHtml;
+
+    // Infine, resetta il selettore della materia per un nuovo quiz
+    subjectSelect.value = "";
+}
+
+// Disabilita il tasto destro del mouse
+document.addEventListener("contextmenu", function(event) {
+    event.preventDefault();
+});
+
+loadCSVData();
+
+function resetQuiz() {
+    // Nasconde il quiz e i risultati
+    document.getElementById('quiz').style.display = 'none';
+    document.getElementById('result').style.display = 'none';
+
+    // Mostra di nuovo la sezione degli allegati
+    document.querySelector('.download-section').style.display = 'block';
+
+    // Nascondi la selezione modalità
+    document.getElementById('mode-selection-container').style.display = 'none';
+
+    // Rimuove temporaneamente l'evento 'change' per evitare il riavvio automatico
+    subjectSelect.removeEventListener('change', handleSubjectSelection);
+
+    // Reimposta la selezione della materia alla prima opzione vuota
+    subjectSelect.value = "";
+
+    // Mostra la sezione del filtro materie (QUESTO È IL PUNTO IN CUI APPARE)
+    document.querySelector('.filter-container').style.display = 'block';
+
+    // Aggiungi nuovamente l'evento 'change'
+    subjectSelect.addEventListener('change', handleSubjectSelection);
+
+    // Ricarica i dati e resetta lo stato del quiz
+    loadCSVData(); // Ricarica i dati originali
+
+    // Resetta lo stato del quiz
+    currentQuestionIndex = 0;
+    correctAnswers = 0;
+    wrongAnswers = 0;
+    answeredQuestionsStatus = [];
+    userAnswers = [];
+    flaggedQuestions = [];
+    subjectResults = {}; // Reset dei risultati per materia
+    currentQuizSubject = ''; // Reset della materia del quiz corrente
+    incorrectQuestionDetails = []; // Reset dei dettagli delle domande errate
+    quizMode = 'study'; // Reset della modalità a studio
+    startTime = Date.now(); // Reset del timer
+    
+    // Ripulisce i dati di rimescolamento sulle domande per il prossimo quiz
+    quizData = quizData.map(q => {
+        delete q.shuffledOptions;
+        delete q.correctAnswerIndexAfterShuffle;
+        return q;
+    });
+    filteredData = [];
+
+    updateProgress(); // Aggiorna la visualizzazione del progresso
+    updateFlaggedCount(); // Aggiorna il contatore delle domande flaggate
+    updateNavigator(); // Aggiorna il navigatore per mostrare lo stato iniziale
+}
+    </script>
+</body>
+</html>
