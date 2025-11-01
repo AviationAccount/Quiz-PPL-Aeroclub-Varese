@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz PPL - Ricerca Domande</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 40px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+    .search-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+    input, button {
+      padding: 10px 15px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .question-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      padding: 20px;
+      transition: transform 0.2s;
+    }
+    .question-card:hover {
+      transform: translateY(-2px);
+    }
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .question-header .numero {
+      font-weight: bold;
+      color: #007bff;
+    }
+    .question-header .materia {
+      font-style: italic;
+      color: #555;
+    }
+    .domanda {
+      margin-bottom: 15px;
+      font-size: 1.1em;
+      color: #333;
+    }
+    .risposte div {
+      margin-bottom: 5px;
+    }
+    .risposte .corretta {
+      background-color: #d4edda;
+      border-left: 5px solid #28a745;
+      padding-left: 5px;
+    }
+    .small {
+      font-size: 0.85em;
+      color: #777;
+      margin-top: 10px;
+    }
+    #noResults {
+      text-align: center;
+      color: #777;
+      margin-top: 30px;
+      font-size: 1.1em;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Postazione Istruttore PPL - Ricerca Domande</h1>
+
+<div class="search-box">
+  <input type="text" id="searchText" placeholder="Cerca nel testo della domanda...">
+  <input type="text" id="searchSubject" placeholder="Materia...">
+  <input type="text" id="searchNumber" placeholder="Numero domanda (es 1001)...">
+  <button id="searchButton">Cerca</button>
+</div>
+
+<div id="questionsContainer"></div>
+<div id="noResults" style="display:none;">Nessun risultato trovato</div>
+
+<script>
+const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7nj9UrBloRfIDxZkRUkxBu1neSuPIyaR4EjBWj90BLyDK3VkOBeqZSxe2pb1jwkE7mIEelHXhzayP/pub?output=csv";
+const container = document.getElementById("questionsContainer");
+const noResults = document.getElementById("noResults");
+let data = [];
+
+function parseCSV(text) {
+  const rows = [];
+  const lines = text.split("\n");
+  for (let line of lines) {
+    const regex = /(".*?"|[^",\s]+)(?=\s*,|\s*$)/g;
+    const matches = [];
+    let match;
+    while ((match = regex.exec(line)) !== null) {
+      matches.push(match[1].replace(/^"|"$/g, ""));
+    }
+    if (matches.length >= 10) rows.push(matches);
+  }
+  return rows;
+}
+
+async function loadCSV() {
+  const response = await fetch(csvUrl);
+  const text = await response.text();
+  const rows = parseCSV(text);
+  data = rows.map(r => ({
+    domanda: r[0],
+    a: r[1],
+    b: r[2],
+    c: r[3],
+    d: r[4],
+    corretta: r[5],
+    numero: r[6],
+    materia: r[7],
+    data: r[8],
+    fonte: r[9] || ""
+  }));
+}
+
+function displayData(filtered) {
+  container.innerHTML = "";
+  if (filtered.length === 0) {
+    noResults.style.display = "block";
+    return;
+  }
+  noResults.style.display = "none";
+
+  filtered.forEach(row => {
+    const risposte = ["a","b","c","d"].map((letter, idx) => {
+      const classe = idx == parseInt(row.corretta) ? "corretta" : "";
+      return `<div class="${classe}"><strong>${letter.toUpperCase()}:</strong> ${row[letter]}</div>`;
+    }).join("");
+
+    const card = document.createElement("div");
+    card.className = "question-card";
+    card.innerHTML = `
+      <div class="question-header">
+        <span class="numero">${row.numero}</span>
+        <span class="materia">${row.materia}</span>
+      </div>
+      <div class="domanda">${row.domanda}</div>
+      <div class="risposte">${risposte}</div>
+      <div class="small">Data: ${row.data} | Fonte: ${row.fonte}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function filterData() {
+  const text = document.getElementById("searchText").value.toLowerCase();
+  const subject = document.getElementById("searchSubject").value.toLowerCase();
+  const number = document.getElementById("searchNumber").value.toLowerCase();
+
+  const filtered = data.filter(row =>
+    (!text || row.domanda.toLowerCase().includes(text)) &&
+    (!subject || row.materia.toLowerCase().includes(subject)) &&
+    (!number || row.numero.toLowerCase().includes(number))
+  );
+  displayData(filtered);
+}
+
+document.getElementById("searchButton").addEventListener("click", filterData);
+
+loadCSV();
+</script>
+
+</body>
+</html>
