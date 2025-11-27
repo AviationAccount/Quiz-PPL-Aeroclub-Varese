@@ -3,50 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz ENAC - Accesso Riservato</title>
+    <title>Ricerca Domande Quiz ENAC - Accesso Riservato</title>
     <style>
-        /* Stili Generali e Moderni */
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            padding: 0; 
-            margin: 0; 
-            background-color: #eef2f7; /* Sfondo chiaro e moderno */
-            color: #333;
+        /* --- Stili Generali e Sfondo (Ripresi da PPL) --- */
+        body {
+            font-family: 'Arial', sans-serif;
+            /* Sfondo Scuro/Blu Sfumato PPL */
+            background: linear-gradient(120deg, #141E30, #243B55);
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            /* CORREZIONE: Rimuovi height: 100vh e overflow: hidden dal body */
+            min-height: 100vh; /* Mantieni altezza minima per lo sfondo */
             display: flex;
             justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            align-items: flex-start; /* Allinea in alto per permettere lo scroll */
             flex-direction: column;
+            padding-top: 40px; /* Aggiungi un po' di spazio in cima */
+            padding-bottom: 40px; /* Aggiungi spazio in fondo */
         }
         
-        /* Stili Container Principale (Dopo Login) */
+        /* --- Stili Contenitore (Ripresi da PPL) --- */
         .main-container {
+            max-width: 950px;
             width: 90%;
-            max-width: 1200px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             padding: 30px;
-            background-color: #fff;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
             display: none; /* Nascosto di default */
             box-sizing: border-box;
+            color: #333; /* Testo interno chiaro */
+            animation: zoomIn 1s forwards; /* Animazione PPL */
+            margin-top: 20px; /* Spazio sotto il login */
+        }
+
+        /* --- Animazione PPL --- */
+        @keyframes zoomIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
         h1 { 
-            color: #007bff; 
-            border-bottom: 2px solid #e1e8f0; 
-            padding-bottom: 15px; 
+            color: #007bff; /* Tonalità blu PPL */
+            border-bottom: 2px solid #ccc; 
+            padding-bottom: 10px; 
             font-weight: 600;
+            text-align: center;
         }
 
-        /* Stili Form di Login */
+        /* --- Stili Login (Adattati allo stile PPL) --- */
         #loginScreen {
-            background-color: #fff;
+            background-color: #ffffff;
             padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             text-align: center;
             width: 100%;
-            max-width: 400px;
+            max-width: 350px;
+            color: #333;
+            /* CORREZIONE: Aggiunto margin per centrare verticalmente se il contenuto è piccolo */
+            margin: auto; 
         }
         #loginScreen h2 {
             color: #007bff;
@@ -54,10 +77,10 @@
             font-size: 1.8em;
         }
         .login-input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #007bff; /* Bordo blu PPL */
             border-radius: 8px;
             box-sizing: border-box;
             font-size: 16px;
@@ -65,7 +88,7 @@
         #loginButton {
             width: 100%;
             padding: 12px;
-            background-color: #007bff;
+            background-color: #007bff; /* Sfondo blu PPL */
             color: white;
             border: none;
             border-radius: 8px;
@@ -80,32 +103,41 @@
             color: red;
             margin-top: 10px;
         }
+        .login-logo {
+            width: 200px;
+            height: auto;
+            margin-bottom: 15px;
+        }
 
-        /* Stili Ricerca e Risultati */
+        /* --- Stili Ricerca --- */
         .search-container { 
             margin-bottom: 20px; 
             padding: 15px; 
-            border: 1px solid #e1e8f0; 
+            border: 1px solid #ccc; 
             border-radius: 8px; 
-            background-color: #f7f9fc; 
+            background-color: #f0f8ff; /* Sfondo chiaro per i controlli */
             display: flex; 
             flex-wrap: wrap; 
             gap: 10px;
         }
         input[type="text"] { 
             padding: 10px; 
-            border: 1px solid #ccc; 
-            border-radius: 4px; 
+            border: 2px solid #007bff; /* Bordo blu PPL */
+            border-radius: 8px; 
             font-size: 16px; 
             flex-grow: 1; 
             min-width: 200px; 
+            background-color: #f0f8ff;
+            color: #333;
         }
+        
+        /* Stile pulsanti generici (Cerca, Reset) */
         button { 
             padding: 10px 15px; 
             background-color: #007bff; 
             color: white; 
             border: none; 
-            border-radius: 4px; 
+            border-radius: 8px; 
             cursor: pointer; 
             font-size: 16px; 
             transition: background-color 0.3s ease;
@@ -114,64 +146,74 @@
             background-color: #0056b3; 
         }
         #resetButton { 
-            background-color: #dc3545; 
+            background-color: #dc3545; /* Rosso errore PPL */
         }
         #resetButton:hover { 
             background-color: #c82333; 
         }
 
+        /* --- Stili Risultati --- */
+        #results { margin-top: 20px; }
         .quiz-result {
-            border: 1px solid #e1e8f0;
+            border: 1px solid #007bff; /* Bordo più visibile */
             padding: 20px;
             margin: 15px 0;
             border-radius: 10px;
-            background-color: #ffffff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            transition: transform 0.2s ease;
-        }
-        .quiz-result:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background-color: #f0f8ff; /* Sfondo chiaro per il box */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         .quiz-result h3 { color: #333; margin-top: 0; }
         .quiz-result p strong { color: #007bff; }
-        .quiz-result ul { list-style: none; padding-left: 0; margin-top: 15px; }
-        .quiz-result li { margin-bottom: 8px; padding: 10px; border-radius: 6px; }
+        .quiz-result h4 { color: #333; }
+        .quiz-result ul { list-style: none; padding-left: 0; margin-top: 10px; }
+        .quiz-result li { margin-bottom: 8px; padding: 10px; border-radius: 6px; color: #333; }
         .correct-answer {
-            background-color: #d4edda;
-            color: #155724;
+            background-color: #28a745 !important; /* Verde corretto PPL */
+            color: white !important;
             font-weight: bold;
-            border: 1px solid #c3e6cb;
+            border: 1px solid #218838;
         }
-        .error { color: red; }
+        .error { color: #dc3545; }
         .subject-tag {
             display: inline-block;
-            background-color: #ffe0b2;
-            color: #e65100;
+            background-color: #f39c12; /* Arancione PPL */
+            color: white;
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 0.9em;
-            font-weight: 600;
+            font-weight: bold;
             margin-bottom: 10px;
         }
 
-        /* Stili Copyright */
+        /* --- Stili Copyright (Adattati allo stile PPL) --- */
         #copyright {
             margin-top: 20px;
             padding: 10px;
             font-size: 0.85em;
-            color: #666;
+            color: #d3d3d3; /* Grigio chiaro PPL */
             text-align: center;
-            border-top: 1px solid #e1e8f0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             width: 90%;
             max-width: 1200px;
             box-sizing: border-box;
+            animation: fadeIn 1s ease 0.5s forwards;
+            opacity: 0;
+            margin-bottom: 20px; /* Spazio extra in fondo alla pagina */
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* Centratura generica del contenuto (funziona ora che flex-direction è column) */
+        .main-container, #loginScreen, #copyright {
+            align-self: center;
         }
     </style>
 </head>
 <body>
     
     <div id="loginScreen">
+        <img src="https://i.ibb.co/PHHxChW/unnamed.jpg" alt="Logo sito quiz ppl" class="login-logo"/>
         <h2>Accesso al Database Quiz</h2>
         <input type="text" id="username" class="login-input" placeholder="Username">
         <input type="password" id="password" class="login-input" placeholder="Password">
@@ -212,24 +254,38 @@
             }
         });
 
+        // Aggiungi l'evento "Enter" sui campi di input
+        document.getElementById('username').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                handleLogin();
+            }
+        });
+
+        document.getElementById('password').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                handleLogin();
+            }
+        });
+        
         function handleLogin() {
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
             const message = document.getElementById('loginMessage');
 
             // Credenziali fisse: allievo / allievo
-            if (username === 'allievo' && password === 'allievo') {
+            if (username === 'test' && password === 'test') {
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'block';
                 // Avvia il caricamento dei dati solo dopo il login
                 loadCSV(); 
+                document.getElementById('copyright').style.display = 'block'; // Mostra il copyright
             } else {
                 message.textContent = 'Credenziali non valide. Riprova.';
                 document.getElementById('password').value = ''; // Pulisce la password
             }
         }
 
-        // --- 2. LOGICA DI PARSING E RICERCA (Mantenuta) ---
+        // --- 2. LOGICA DI PARSING E RICERCA ---
 
         function parseCSV(csv) {
             const CSV_DELIMITER_REGEX = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/g;
@@ -241,7 +297,6 @@
                 let columns = line.split(CSV_DELIMITER_REGEX);
                 columns = columns.map(col => col.replace(/^"|"$/g, '').trim());
 
-                // Controlla per almeno 8 colonne: Domanda(0), R1-R4(1-4), Indice(5), ID(6), Materia(7)
                 if (columns.length >= 8) {
                     data.push(columns);
                 }
@@ -251,23 +306,24 @@
 
         async function loadCSV() {
             const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '<p>Caricamento dati in corso...</p>';
+            resultsDiv.innerHTML = '<p style="color: #007bff;">Caricamento dei dati in corso...</p>';
             try {
                 const response = await fetch(CSV_URL);
                 if (!response.ok) {
-                    throw new Error(`Errore di rete: ${response.statusText}.`);
+                    throw new Error(`Errore di rete: ${response.statusText}. Assicurati che l'URL sia pubblicamente accessibile.`);
                 }
                 const csvText = await response.text();
                 quizData = parseCSV(csvText);
 
                 if (quizData.length > 0) {
-                    resultsDiv.innerHTML = `<p style="color: green; font-weight: 600;">Dati caricati con successo! (${quizData.length} domande disponibili). Pronta per la ricerca.</p>`;
+                    resultsDiv.innerHTML = `<p style="color: #28a745; font-weight: 600;">Dati caricati con successo! (${quizData.length} domande disponibili). Pronta per la ricerca.</p>`;
                 } else {
-                     resultsDiv.innerHTML = `<p class="error">Dati caricati, ma nessuna riga di quiz trovata. Verifica la struttura del file.</p>`;
+                     resultsDiv.innerHTML = `<p class="error">Dati caricati, ma nessuna riga di quiz trovata. Verifica la struttura del file e il delimitatore.</p>`;
                 }
                 
             } catch (error) {
-                resultsDiv.innerHTML = `<p class="error">⚠️ Errore nel caricamento del file CSV: ${error.message}.</p>`;
+                resultsDiv.innerHTML = `<p class="error">⚠️ Errore nel caricamento del file CSV: ${error.message}. Controlla i permessi del link.</p>`;
+                console.error("Errore CSV:", error);
             }
         }
 
@@ -278,12 +334,12 @@
             resultsDiv.innerHTML = '';
 
             if (!searchText && !searchId) {
-                resultsDiv.innerHTML = '<p>Per favore, inserisci il testo o l\'ID della domanda per iniziare la ricerca.</p>';
+                resultsDiv.innerHTML = '<p style="color: #007bff;">Per favore, inserisci il testo o l\'ID della domanda per iniziare la ricerca.</p>';
                 return;
             }
 
             if (quizData.length === 0) {
-                 resultsDiv.innerHTML = '<p class="error">Dati del quiz non ancora caricati o caricamento fallito. Riprova.</p>';
+                 resultsDiv.innerHTML = '<p class="error">Dati del quiz non ancora caricati o caricamento fallito. Riprova o verifica il link.</p>';
                  return;
             }
             
@@ -306,18 +362,18 @@
                     displayResult(row, resultsDiv);
                 });
             } else {
-                resultsDiv.innerHTML = '<p>Nessuna domanda trovata con i criteri di ricerca specificati.</p>';
+                resultsDiv.innerHTML = '<p style="color: #007bff;">Nessuna domanda trovata con i criteri di ricerca specificati.</p>';
             }
         }
 
         function resetSearch() {
             document.getElementById('searchText').value = '';
             document.getElementById('searchId').value = '';
-            document.getElementById('results').innerHTML = `<p style="color: green; font-weight: 600;">Dati caricati con successo! (${quizData.length} domande disponibili). Inserisci un nuovo criterio di ricerca.</p>`;
+            document.getElementById('results').innerHTML = `<p style="color: #28a745; font-weight: 600;">Dati caricati con successo! (${quizData.length} domande disponibili). Inserisci un nuovo criterio di ricerca.</p>`;
         }
 
         function displayResult(row, container) {
-            // 0:Domanda, 1:Risp A, 2:Risp B, 3:Risp C, 4:Risp D, 5:Indice Corretto (0-3), 6:ID, 7:Materia
+            // Struttura colonne: 0:Domanda, 1:Risp A, 2:Risp B, 3:Risp C, 4:Risp D, 5:Indice Corretto (0-3), 6:ID, 7:Materia
             const questionText = row[0];
             const answers = [row[1], row[2], row[3], row[4]];
             
@@ -367,8 +423,13 @@
             resultDiv.innerHTML = htmlContent;
             container.appendChild(resultDiv);
         }
+        
+        // Nascondi inizialmente la sezione di ricerca e il copyright
+        document.addEventListener('DOMContentLoaded', () => {
+             document.getElementById('mainContent').style.display = 'none';
+             document.getElementById('copyright').style.display = 'none';
+        });
 
-        // Il caricamento dei dati è spostato all'interno di handleLogin()
     </script>
 </body>
 </html>
