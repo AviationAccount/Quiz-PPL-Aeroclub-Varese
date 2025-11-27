@@ -1,193 +1,224 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <title>Quiz PPL - Ricerca Domande</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f0f2f5;
-      margin: 0;
-      padding: 40px;
-    }
-    h1 {
-      text-align: center;
-      color: #333;
-      margin-bottom: 30px;
-    }
-    .search-box {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 30px;
-    }
-    input, button {
-      padding: 10px 15px;
-      font-size: 14px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    .question-card {
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-      padding: 20px;
-      transition: transform 0.2s;
-    }
-    .question-card:hover {
-      transform: translateY(-2px);
-    }
-    .question-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    .question-header .numero {
-      font-weight: bold;
-      color: #007bff;
-    }
-    .question-header .materia {
-      font-style: italic;
-      color: #555;
-    }
-    .domanda {
-      margin-bottom: 15px;
-      font-size: 1.1em;
-      color: #333;
-    }
-    .risposte div {
-      margin-bottom: 5px;
-    }
-    .risposte .corretta {
-      background-color: #d4edda;
-      border-left: 5px solid #28a745;
-      padding-left: 5px;
-    }
-    .small {
-      font-size: 0.85em;
-      color: #777;
-      margin-top: 10px;
-    }
-    #noResults {
-      text-align: center;
-      color: #777;
-      margin-top: 30px;
-      font-size: 1.1em;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ricerca Domande Quiz ENAC</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f4f4f4; }
+        h1 { color: #0056b3; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
+        .search-container { margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #fff; display: flex; flex-wrap: wrap; gap: 10px;}
+        input[type="text"] { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; flex-grow: 1; min-width: 200px; }
+        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #0056b3; }
+        #resetButton { background-color: #dc3545; }
+        #resetButton:hover { background-color: #c82333; }
+
+        #results { margin-top: 20px; }
+        .quiz-result {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .quiz-result h3 { color: #333; margin-top: 0; }
+        .quiz-result p strong { color: #0056b3; }
+        .quiz-result ul { list-style: none; padding-left: 0; margin-top: 10px; }
+        .quiz-result li { margin-bottom: 8px; padding: 8px; border-radius: 3px; }
+        .correct-answer {
+            background-color: #d4edda;
+            color: #155724;
+            font-weight: bold;
+            border: 1px solid #c3e6cb;
+        }
+        .error { color: red; }
+        .subject-tag {
+            display: inline-block;
+            background-color: #ffe0b2;
+            color: #e65100;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
+    <h1>Ricerca Domande Quiz PPL Ver 1.0 - 12/2025 </h1>
+    
+    <div class="search-container">
+        <input type="text" id="searchText" placeholder="Cerca per Testo della Domanda">
+        <input type="text" id="searchId" placeholder="Cerca per ID Domanda (es. 1001)">
+        <button onclick="handleSearch()">Cerca</button>
+        <button id="resetButton" onclick="resetSearch()">Reset</button>
+    </div>
 
-<h1>Postazione Istruttore PPL - Ricerca Domande</h1>
+    <div id="results">
+        <p>Caricamento dei dati in corso...</p>
+    </div>
 
-<div class="search-box">
-  <input type="text" id="searchText" placeholder="Cerca nel testo della domanda...">
-  <input type="text" id="searchSubject" placeholder="Materia...">
-  <input type="text" id="searchNumber" placeholder="Numero domanda (es 1001)...">
-  <button id="searchButton">Cerca</button>
-</div>
+    <script>
+        // URL del file CSV fornito dall'utente.
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7nj9UrBloRfIDxZkRUkxBu1neSuPIyaR4EjBWj90BLyDK3VkOBeqZSxe2pb1jwkE7mIEelHXhzayP/pub?output=csv';
+        let quizData = [];
 
-<div id="questionsContainer"></div>
-<div id="noResults" style="display:none;">Nessun risultato trovato</div>
+        /**
+         * Funzione robusta per analizzare il testo CSV utilizzando la VIRGOLA come delimitatore.
+         * Gestisce i campi con virgole interne se racchiusi tra virgolette doppie.
+         */
+        function parseCSV(csv) {
+            // Regex robusta per dividere per virgola, ignorando quelle all'interno delle virgolette doppie.
+            const CSV_DELIMITER_REGEX = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/g;
+            const lines = csv.split('\n').filter(line => line.trim() !== '');
+            const data = [];
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                let columns = line.split(CSV_DELIMITER_REGEX);
+                
+                // Pulisce e trimma tutti i campi, rimuovendo virgolette iniziali/finali
+                columns = columns.map(col => col.replace(/^"|"$/g, '').trim());
 
-<script>
-const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7nj9UrBloRfIDxZkRUkxBu1neSuPIyaR4EjBWj90BLyDK3VkOBeqZSxe2pb1jwkE7mIEelHXhzayP/pub?output=csv";
-const container = document.getElementById("questionsContainer");
-const noResults = document.getElementById("noResults");
-let data = [];
+                // Struttura colonne:
+                // 0:Domanda, 1:Risp A (Col B), 2:Risp B (Col C), 3:Risp C (Col D), 4:Risp D (Col E), 
+                // 5:Indice Corretto (0-3), 6:ID, 7:Materia
+                if (columns.length >= 8) {
+                    data.push(columns);
+                }
+            }
+            return data;
+        }
 
-function parseCSV(text) {
-  const rows = [];
-  const lines = text.split("\n");
-  for (let line of lines) {
-    const regex = /(".*?"|[^",\s]+)(?=\s*,|\s*$)/g;
-    const matches = [];
-    let match;
-    while ((match = regex.exec(line)) !== null) {
-      matches.push(match[1].replace(/^"|"$/g, ""));
-    }
-    if (matches.length >= 10) rows.push(matches);
-  }
-  return rows;
-}
+        async function loadCSV() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<p>Caricamento dei dati in corso...</p>';
+            try {
+                const response = await fetch(CSV_URL);
+                if (!response.ok) {
+                    throw new Error(`Errore di rete: ${response.statusText}. Assicurati che l'URL sia pubblicamente accessibile.`);
+                }
+                const csvText = await response.text();
+                quizData = parseCSV(csvText);
 
-async function loadCSV() {
-  const response = await fetch(csvUrl);
-  const text = await response.text();
-  const rows = parseCSV(text);
-  data = rows.map(r => ({
-    domanda: r[0],
-    a: r[1],
-    b: r[2],
-    c: r[3],
-    d: r[4],
-    corretta: r[5],
-    numero: r[6],
-    materia: r[7],
-    data: r[8],
-    fonte: r[9] || ""
-  }));
-}
+                if (quizData.length > 0) {
+                    resultsDiv.innerHTML = `<p>Dati caricati con successo! (${quizData.length} domande disponibili). Pronta per la ricerca.</p>`;
+                } else {
+                     resultsDiv.innerHTML = `<p class="error">Dati caricati, ma nessuna riga di quiz trovata. Verifica la struttura del file e il delimitatore.</p>`;
+                }
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<p class="error">⚠️ Errore nel caricamento del file CSV: ${error.message}. Controlla i permessi del link.</p>`;
+                console.error("Errore CSV:", error);
+            }
+        }
 
-function displayData(filtered) {
-  container.innerHTML = "";
-  if (filtered.length === 0) {
-    noResults.style.display = "block";
-    return;
-  }
-  noResults.style.display = "none";
+        function handleSearch() {
+            const searchText = document.getElementById('searchText').value.trim().toLowerCase();
+            const searchId = document.getElementById('searchId').value.trim().replace('#', '').toLowerCase();
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
 
-  filtered.forEach(row => {
-    const risposte = ["a","b","c","d"].map((letter, idx) => {
-      const classe = idx == parseInt(row.corretta) ? "corretta" : "";
-      return `<div class="${classe}"><strong>${letter.toUpperCase()}:</strong> ${row[letter]}</div>`;
-    }).join("");
+            if (!searchText && !searchId) {
+                resultsDiv.innerHTML = '<p>Per favore, inserisci il testo o l\'ID della domanda per iniziare la ricerca.</p>';
+                return;
+            }
 
-    const card = document.createElement("div");
-    card.className = "question-card";
-    card.innerHTML = `
-      <div class="question-header">
-        <span class="numero">${row.numero}</span>
-        <span class="materia">${row.materia}</span>
-      </div>
-      <div class="domanda">${row.domanda}</div>
-      <div class="risposte">${risposte}</div>
-      <div class="small">Data: ${row.data} | Fonte: ${row.fonte}</div>
-    `;
-    container.appendChild(card);
-  });
-}
+            if (quizData.length === 0) {
+                 resultsDiv.innerHTML = '<p class="error">Dati del quiz non ancora caricati o caricamento fallito. Riprova o verifica il link.</p>';
+                 return;
+            }
+            
+            let foundResults = [];
 
-function filterData() {
-  const text = document.getElementById("searchText").value.toLowerCase();
-  const subject = document.getElementById("searchSubject").value.toLowerCase();
-  const number = document.getElementById("searchNumber").value.toLowerCase();
+            if (searchId) {
+                foundResults = quizData.filter(row => {
+                    const questionId = row[6] ? row[6].replace('#', '').trim().toLowerCase() : '';
+                    return questionId === searchId;
+                });
+            } else if (searchText) {
+                 foundResults = quizData.filter(row => {
+                    const questionText = row[0] ? row[0].toLowerCase() : '';
+                    return questionText.includes(searchText);
+                });
+            }
 
-  const filtered = data.filter(row =>
-    (!text || row.domanda.toLowerCase().includes(text)) &&
-    (!subject || row.materia.toLowerCase().includes(subject)) &&
-    (!number || row.numero.toLowerCase().includes(number))
-  );
-  displayData(filtered);
-}
+            if (foundResults.length > 0) {
+                foundResults.forEach(row => {
+                    displayResult(row, resultsDiv);
+                });
+            } else {
+                resultsDiv.innerHTML = '<p>Nessuna domanda trovata con i criteri di ricerca specificati.</p>';
+            }
+        }
 
-document.getElementById("searchButton").addEventListener("click", filterData);
+        function resetSearch() {
+            document.getElementById('searchText').value = '';
+            document.getElementById('searchId').value = '';
+            document.getElementById('results').innerHTML = `<p>Dati caricati con successo! (${quizData.length} domande disponibili). Inserisci un nuovo criterio di ricerca.</p>`;
+        }
 
-loadCSV();
-</script>
+        function displayResult(row, container) {
+            // Struttura colonne: 0:Domanda, 1:Risp A, 2:Risp B, 3:Risp C, 4:Risp D, 5:Indice Corretto (0-3), 6:ID, 7:Materia
+            const questionText = row[0];
+            // Le risposte vanno dalle colonne 1 a 4 del CSV
+            const answers = [row[1], row[2], row[3], row[4]];
+            
+            // Estrazione e pulizia dati
+            const correctIndexRaw = row[5] ? row[5].trim() : '';
+            // *** CORREZIONE: Interpretiamo direttamente il valore letto (0, 1, 2, 3) ***
+            const correctIndex = parseInt(correctIndexRaw, 10);
+            
+            const questionId = row[6] ? row[6].replace('#', '').trim() : 'N/D';
+            const subject = row[7] ? row[7].trim() : 'Materia Sconosciuta';
+            
+            // L'indice corretto deve essere compreso tra 0 e 3 (base zero)
+            const isValidIndex = correctIndex >= 0 && correctIndex <= 3;
 
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'quiz-result';
+
+            let htmlContent = `
+                <div class="subject-tag">${subject}</div>
+                <h3>Domanda ID: #${questionId}</h3>
+                <p><strong>Testo:</strong> ${questionText}</p>
+                <h4>Risposte:</h4>
+                <ul>
+            `;
+
+            const answerLabels = ['A', 'B', 'C', 'D']; // Le etichette visibili per le risposte
+            
+            if (!isValidIndex) {
+                 htmlContent += `<p style="color: orange; font-weight: bold;">ATTENZIONE: Indice di risposta corretta non valido (${correctIndexRaw}). L'indice deve essere 0, 1, 2 o 3. Risposta non evidenziata.</p>`;
+            }
+
+            answers.forEach((answer, index) => {
+                // Evidenziazione solo se l'indice è valido E l'indice del ciclo (0, 1, 2, 3) 
+                // corrisponde all'indice corretto letto dal CSV (0, 1, 2, 3)
+                const isCorrect = isValidIndex && index === correctIndex;
+                const correctLabel = isCorrect ? ' (RISPOSTA CORRETTA)' : '';
+                const liClass = isCorrect ? 'class="correct-answer"' : '';
+
+                if (answer) {
+                    htmlContent += `
+                        <li ${liClass}>
+                            ${answerLabels[index]}. ${answer.trim()} ${correctLabel}
+                        </li>
+                    `;
+                }
+            });
+
+            htmlContent += `
+                </ul>
+            `;
+            resultDiv.innerHTML = htmlContent;
+            container.appendChild(resultDiv);
+        }
+
+        loadCSV();
+
+    </script>
 </body>
 </html>
