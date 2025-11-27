@@ -3,30 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ricerca Domande Quiz ENAC</title>
+    <title>Quiz ENAC - Accesso Riservato</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f4f4f4; }
-        h1 { color: #0056b3; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
-        .search-container { margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #fff; display: flex; flex-wrap: wrap; gap: 10px;}
-        input[type="text"] { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; flex-grow: 1; min-width: 200px; }
-        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
-        button:hover { background-color: #0056b3; }
-        #resetButton { background-color: #dc3545; }
-        #resetButton:hover { background-color: #c82333; }
+        /* Stili Generali e Moderni */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            padding: 0; 
+            margin: 0; 
+            background-color: #eef2f7; /* Sfondo chiaro e moderno */
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+        
+        /* Stili Container Principale (Dopo Login) */
+        .main-container {
+            width: 90%;
+            max-width: 1200px;
+            padding: 30px;
+            background-color: #fff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            display: none; /* Nascosto di default */
+            box-sizing: border-box;
+        }
 
-        #results { margin-top: 20px; }
-        .quiz-result {
+        h1 { 
+            color: #007bff; 
+            border-bottom: 2px solid #e1e8f0; 
+            padding-bottom: 15px; 
+            font-weight: 600;
+        }
+
+        /* Stili Form di Login */
+        #loginScreen {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+        #loginScreen h2 {
+            color: #007bff;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        .login-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
             border: 1px solid #ccc;
-            padding: 15px;
-            margin: 15px 0;
             border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        #loginButton {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 17px;
+            transition: background-color 0.3s ease;
+        }
+        #loginButton:hover {
+            background-color: #0056b3;
+        }
+        #loginMessage {
+            color: red;
+            margin-top: 10px;
+        }
+
+        /* Stili Ricerca e Risultati */
+        .search-container { 
+            margin-bottom: 20px; 
+            padding: 15px; 
+            border: 1px solid #e1e8f0; 
+            border-radius: 8px; 
+            background-color: #f7f9fc; 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 10px;
+        }
+        input[type="text"] { 
+            padding: 10px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+            font-size: 16px; 
+            flex-grow: 1; 
+            min-width: 200px; 
+        }
+        button { 
+            padding: 10px 15px; 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            transition: background-color 0.3s ease;
+        }
+        button:hover { 
+            background-color: #0056b3; 
+        }
+        #resetButton { 
+            background-color: #dc3545; 
+        }
+        #resetButton:hover { 
+            background-color: #c82333; 
+        }
+
+        .quiz-result {
+            border: 1px solid #e1e8f0;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
             background-color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+        }
+        .quiz-result:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         .quiz-result h3 { color: #333; margin-top: 0; }
-        .quiz-result p strong { color: #0056b3; }
-        .quiz-result ul { list-style: none; padding-left: 0; margin-top: 10px; }
-        .quiz-result li { margin-bottom: 8px; padding: 8px; border-radius: 3px; }
+        .quiz-result p strong { color: #007bff; }
+        .quiz-result ul { list-style: none; padding-left: 0; margin-top: 15px; }
+        .quiz-result li { margin-bottom: 8px; padding: 10px; border-radius: 6px; }
         .correct-answer {
             background-color: #d4edda;
             color: #155724;
@@ -41,36 +151,87 @@
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 0.9em;
-            font-weight: bold;
+            font-weight: 600;
             margin-bottom: 10px;
+        }
+
+        /* Stili Copyright */
+        #copyright {
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 0.85em;
+            color: #666;
+            text-align: center;
+            border-top: 1px solid #e1e8f0;
+            width: 90%;
+            max-width: 1200px;
+            box-sizing: border-box;
         }
     </style>
 </head>
 <body>
-    <h1>Ricerca Domande Quiz PPL Ver 1.0 - 12/2025 </h1>
     
-    <div class="search-container">
-        <input type="text" id="searchText" placeholder="Cerca per Testo della Domanda">
-        <input type="text" id="searchId" placeholder="Cerca per ID Domanda (es. 1001)">
-        <button onclick="handleSearch()">Cerca</button>
-        <button id="resetButton" onclick="resetSearch()">Reset</button>
+    <div id="loginScreen">
+        <h2>Accesso al Database Quiz</h2>
+        <input type="text" id="username" class="login-input" placeholder="Username">
+        <input type="password" id="password" class="login-input" placeholder="Password">
+        <button id="loginButton" onclick="handleLogin()">Accedi</button>
+        <p id="loginMessage"></p>
     </div>
 
-    <div id="results">
-        <p>Caricamento dei dati in corso...</p>
+    <div class="main-container" id="mainContent">
+        <h1>Ricerca Domande Quiz</h1>
+        
+        <div class="search-container">
+            <input type="text" id="searchText" placeholder="Cerca per Testo della Domanda">
+            <input type="text" id="searchId" placeholder="Cerca per ID Domanda (es. 1001)">
+            <button onclick="handleSearch()">Cerca</button>
+            <button id="resetButton" onclick="resetSearch()">Reset</button>
+        </div>
+
+        <div id="results">
+            <p>Caricamento dati in corso...</p>
+        </div>
     </div>
+
+    <footer id="copyright">
+        © 2025 by A.D per Aeroclub di Varese. Tutti i diritti riservati. Le informazioni e i contenuti di questo quiz sono protetti da copyright. È vietata la riproduzione non autorizzata.
+    </footer>
 
     <script>
-        // URL del file CSV fornito dall'utente.
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7nj9UrBloRfIDxZkRUkxBu1neSuPIyaR4EjBWj90BLyDK3VkOBeqZSxe2pb1jwkE7mIEelHXhzayP/pub?output=csv';
         let quizData = [];
 
-        /**
-         * Funzione robusta per analizzare il testo CSV utilizzando la VIRGOLA come delimitatore.
-         * Gestisce i campi con virgole interne se racchiusi tra virgolette doppie.
-         */
+        // --- 1. LOGICA DI ACCESSO E PROTEZIONE ---
+        
+        // Blocca il tasto destro del mouse e i tasti di sviluppo (F12, Ctrl+Shift+I/J)
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('keydown', event => {
+            if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && (event.key === 'I' || event.key === 'J'))) {
+                event.preventDefault();
+            }
+        });
+
+        function handleLogin() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const message = document.getElementById('loginMessage');
+
+            // Credenziali fisse: allievo / allievo
+            if (username === 'allievo' && password === 'allievo') {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                // Avvia il caricamento dei dati solo dopo il login
+                loadCSV(); 
+            } else {
+                message.textContent = 'Credenziali non valide. Riprova.';
+                document.getElementById('password').value = ''; // Pulisce la password
+            }
+        }
+
+        // --- 2. LOGICA DI PARSING E RICERCA (Mantenuta) ---
+
         function parseCSV(csv) {
-            // Regex robusta per dividere per virgola, ignorando quelle all'interno delle virgolette doppie.
             const CSV_DELIMITER_REGEX = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/g;
             const lines = csv.split('\n').filter(line => line.trim() !== '');
             const data = [];
@@ -78,13 +239,9 @@
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i];
                 let columns = line.split(CSV_DELIMITER_REGEX);
-                
-                // Pulisce e trimma tutti i campi, rimuovendo virgolette iniziali/finali
                 columns = columns.map(col => col.replace(/^"|"$/g, '').trim());
 
-                // Struttura colonne:
-                // 0:Domanda, 1:Risp A (Col B), 2:Risp B (Col C), 3:Risp C (Col D), 4:Risp D (Col E), 
-                // 5:Indice Corretto (0-3), 6:ID, 7:Materia
+                // Controlla per almeno 8 colonne: Domanda(0), R1-R4(1-4), Indice(5), ID(6), Materia(7)
                 if (columns.length >= 8) {
                     data.push(columns);
                 }
@@ -94,24 +251,23 @@
 
         async function loadCSV() {
             const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '<p>Caricamento dei dati in corso...</p>';
+            resultsDiv.innerHTML = '<p>Caricamento dati in corso...</p>';
             try {
                 const response = await fetch(CSV_URL);
                 if (!response.ok) {
-                    throw new Error(`Errore di rete: ${response.statusText}. Assicurati che l'URL sia pubblicamente accessibile.`);
+                    throw new Error(`Errore di rete: ${response.statusText}.`);
                 }
                 const csvText = await response.text();
                 quizData = parseCSV(csvText);
 
                 if (quizData.length > 0) {
-                    resultsDiv.innerHTML = `<p>Dati caricati con successo! (${quizData.length} domande disponibili). Pronta per la ricerca.</p>`;
+                    resultsDiv.innerHTML = `<p style="color: green; font-weight: 600;">Dati caricati con successo! (${quizData.length} domande disponibili). Pronta per la ricerca.</p>`;
                 } else {
-                     resultsDiv.innerHTML = `<p class="error">Dati caricati, ma nessuna riga di quiz trovata. Verifica la struttura del file e il delimitatore.</p>`;
+                     resultsDiv.innerHTML = `<p class="error">Dati caricati, ma nessuna riga di quiz trovata. Verifica la struttura del file.</p>`;
                 }
                 
             } catch (error) {
-                resultsDiv.innerHTML = `<p class="error">⚠️ Errore nel caricamento del file CSV: ${error.message}. Controlla i permessi del link.</p>`;
-                console.error("Errore CSV:", error);
+                resultsDiv.innerHTML = `<p class="error">⚠️ Errore nel caricamento del file CSV: ${error.message}.</p>`;
             }
         }
 
@@ -127,7 +283,7 @@
             }
 
             if (quizData.length === 0) {
-                 resultsDiv.innerHTML = '<p class="error">Dati del quiz non ancora caricati o caricamento fallito. Riprova o verifica il link.</p>';
+                 resultsDiv.innerHTML = '<p class="error">Dati del quiz non ancora caricati o caricamento fallito. Riprova.</p>';
                  return;
             }
             
@@ -157,24 +313,21 @@
         function resetSearch() {
             document.getElementById('searchText').value = '';
             document.getElementById('searchId').value = '';
-            document.getElementById('results').innerHTML = `<p>Dati caricati con successo! (${quizData.length} domande disponibili). Inserisci un nuovo criterio di ricerca.</p>`;
+            document.getElementById('results').innerHTML = `<p style="color: green; font-weight: 600;">Dati caricati con successo! (${quizData.length} domande disponibili). Inserisci un nuovo criterio di ricerca.</p>`;
         }
 
         function displayResult(row, container) {
-            // Struttura colonne: 0:Domanda, 1:Risp A, 2:Risp B, 3:Risp C, 4:Risp D, 5:Indice Corretto (0-3), 6:ID, 7:Materia
+            // 0:Domanda, 1:Risp A, 2:Risp B, 3:Risp C, 4:Risp D, 5:Indice Corretto (0-3), 6:ID, 7:Materia
             const questionText = row[0];
-            // Le risposte vanno dalle colonne 1 a 4 del CSV
             const answers = [row[1], row[2], row[3], row[4]];
             
-            // Estrazione e pulizia dati
+            // Logica Indice Corretto a base 0
             const correctIndexRaw = row[5] ? row[5].trim() : '';
-            // *** CORREZIONE: Interpretiamo direttamente il valore letto (0, 1, 2, 3) ***
             const correctIndex = parseInt(correctIndexRaw, 10);
             
             const questionId = row[6] ? row[6].replace('#', '').trim() : 'N/D';
             const subject = row[7] ? row[7].trim() : 'Materia Sconosciuta';
             
-            // L'indice corretto deve essere compreso tra 0 e 3 (base zero)
             const isValidIndex = correctIndex >= 0 && correctIndex <= 3;
 
             const resultDiv = document.createElement('div');
@@ -188,15 +341,13 @@
                 <ul>
             `;
 
-            const answerLabels = ['A', 'B', 'C', 'D']; // Le etichette visibili per le risposte
+            const answerLabels = ['A', 'B', 'C', 'D']; 
             
             if (!isValidIndex) {
-                 htmlContent += `<p style="color: orange; font-weight: bold;">ATTENZIONE: Indice di risposta corretta non valido (${correctIndexRaw}). L'indice deve essere 0, 1, 2 o 3. Risposta non evidenziata.</p>`;
+                 htmlContent += `<p style="color: orange; font-weight: bold;">ATTENZIONE: Indice di risposta corretta non valido (${correctIndexRaw}). Risposta non evidenziata.</p>`;
             }
 
             answers.forEach((answer, index) => {
-                // Evidenziazione solo se l'indice è valido E l'indice del ciclo (0, 1, 2, 3) 
-                // corrisponde all'indice corretto letto dal CSV (0, 1, 2, 3)
                 const isCorrect = isValidIndex && index === correctIndex;
                 const correctLabel = isCorrect ? ' (RISPOSTA CORRETTA)' : '';
                 const liClass = isCorrect ? 'class="correct-answer"' : '';
@@ -217,8 +368,7 @@
             container.appendChild(resultDiv);
         }
 
-        loadCSV();
-
+        // Il caricamento dei dati è spostato all'interno di handleLogin()
     </script>
 </body>
 </html>
