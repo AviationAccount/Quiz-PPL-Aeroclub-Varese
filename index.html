@@ -89,6 +89,40 @@
             flex-direction: column;
             gap: 15px;
         }
+        
+        /* Nuovo stile per il contenitore del filtro per abilitare Flexbox */
+.filter-container {
+    display: flex; /* Abilita flexbox */
+    align-items: center; /* Allinea verticalmente gli elementi */
+    justify-content: center; /* Centra orizzontalmente */
+    flex-wrap: wrap; /* Permette agli elementi di andare a capo su schermi piccoli */
+    gap: 10px; /* Spazio tra gli elementi */
+    text-align: center;
+    margin-bottom: 2px;
+    color: black;
+}
+
+/* Stile per il nuovo pulsante di ricerca */
+.search-button-link {
+    text-decoration: none; /* Rimuove la sottolineatura dal link */
+}
+
+.search-button-link button {
+    padding: 8px 15px;
+    font-size: 1.1em;
+    border: 2px solid #e67e22;
+    border-radius: 8px;
+    background-color: #f39c12;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+    height: 46px; /* Lascia questa */
+    /* margin-top: 5px; <--- RIMUOVI O COMMENTA QUESTA RIGA */
+}
+
+.search-button-link button:hover {
+    background-color: #e67e22; /* Arancione più scuro al passaggio del mouse */
+}
 
         .options button {
             display: flex;
@@ -485,7 +519,7 @@
             color: black;
             text-align: center;
         }
-
+        
         .mode-selection-container button {
             padding: 15px 30px;
             font-size: 1.3em;
@@ -542,8 +576,11 @@
                     <option value="Procedure operative">Procedure operative</option>
                     <option value="Prestazioni e Pianificazione">Prestazioni e Pianificazione</option>
                     <option value="Fattore umano">Fattore umano</option>
-                </select>
-            </div>
+</select>
+        <a href="https://aviationaccount.github.io/Quiz-PPL-Aeroclub-Varese/cerca"=quiz+ppl+domanda" target="_blank" class="search-button-link">
+            <button>Ricerca Domande 🔍</button>
+        </a>
+    </div>
             <!-- Nuova sezione per la selezione della modalità (Studio/Esame) -->
             <div id="mode-selection-container" class="mode-selection-container" style="display: none;">
                 <h3>Scegli la modalità:</h3>
