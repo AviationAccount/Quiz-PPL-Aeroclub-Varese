@@ -5,248 +5,288 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ricerca Domande Quiz PPL - Accesso Riservato</title>
     <style>
-        /* --- Stili Generali e Sfondo (Ripresi da PPL) --- */
-        body {
-            font-family: 'Arial', sans-serif;
-            /* Sfondo Scuro/Blu Sfumato PPL */
-            background: linear-gradient(120deg, #141E30, #243B55);
-            color: #fff;
-            margin: 0;
-            padding: 0;
-            /* CORREZIONE: Rimuovi height: 100vh e overflow: hidden dal body */
-            min-height: 100vh; /* Mantieni altezza minima per lo sfondo */
-            display: flex;
-            justify-content: center;
-            align-items: flex-start; /* Allinea in alto per permettere lo scroll */
-            flex-direction: column;
-            padding-top: 40px; /* Aggiungi un po' di spazio in cima */
-            padding-bottom: 40px; /* Aggiungi spazio in fondo */
-        }
-        
-        /* --- Stili Contenitore (Ripresi da PPL) --- */
-        .main-container {
-            max-width: 950px;
-            width: 90%;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            padding: 30px;
-            display: none; /* Nascosto di default */
-            box-sizing: border-box;
-            color: #333; /* Testo interno chiaro */
-            animation: zoomIn 1s forwards; /* Animazione PPL */
-            margin-top: 20px; /* Spazio sotto il login */
+        /* --- VARIABILI PREMIUM --- */
+        :root {
+            --primary: #0072ff;
+            --accent: #00d2ff;
+            --dark-bg: #141E30;
+            --dark-blue: #243B55;
+            --success: #28a745;
+            --danger: #dc3545;
+            --white: #ffffff;
+            --text-dark: #1e293b;
+            --gray-light: #f8fafc;
         }
 
-        /* --- Animazione PPL --- */
-        @keyframes zoomIn {
-            from {
-                transform: scale(0);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
+        /* --- RESET E BACKGROUND --- */
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(120deg, var(--dark-bg), var(--dark-blue));
+            color: var(--white);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            flex-direction: column;
+            padding-top: 40px;
+            padding-bottom: 40px;
+        }
+
+        /* --- SCHERMATA DI LOGIN --- */
+        #loginScreen {
+            background-color: var(--white);
+            padding: 45px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            width: 100%;
+            max-width: 380px;
+            color: var(--text-dark);
+            margin: auto;
+            animation: zoomIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .login-logo {
+            width: 180px;
+            height: auto;
+            margin-bottom: 25px;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
+        }
+
+        #loginScreen h2 {
+            color: var(--text-dark);
+            margin-bottom: 25px;
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: var(--gray-light);
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background-color: var(--white);
+            box-shadow: 0 0 0 4px rgba(0, 210, 255, 0.15);
+        }
+
+        #loginButton {
+            width: 100%;
+            padding: 16px;
+            margin-top: 15px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 114, 255, 0.3);
+        }
+
+        #loginButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(0, 210, 255, 0.4);
+            filter: brightness(1.1);
+        }
+
+        /* --- CONTENITORE PRINCIPALE (RICERCA) --- */
+        .main-container {
+            max-width: 1000px;
+            width: 92%;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            display: none;
+            box-sizing: border-box;
+            color: var(--text-dark);
+            margin: 20px auto;
+            animation: zoomIn 0.8s forwards;
         }
 
         h1 { 
-            color: #007bff; /* Tonalità blu PPL */
-            border-bottom: 2px solid #ccc; 
-            padding-bottom: 10px; 
-            font-weight: 600;
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 30px;
+            font-weight: 800;
             text-align: center;
+            letter-spacing: -1px;
         }
 
-        /* --- Stili Login (Adattati allo stile PPL) --- */
-        #loginScreen {
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 100%;
-            max-width: 350px;
-            color: #333;
-            /* CORREZIONE: Aggiunto margin per centrare verticalmente se il contenuto è piccolo */
-            margin: auto; 
-        }
-        #loginScreen h2 {
-            color: #007bff;
-            margin-bottom: 20px;
-            font-size: 1.8em;
-        }
-        .login-input {
-            width: 90%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 2px solid #007bff; /* Bordo blu PPL */
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
-        #loginButton {
-            width: 100%;
-            padding: 12px;
-            background-color: #007bff; /* Sfondo blu PPL */
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 17px;
-            transition: background-color 0.3s ease;
-        }
-        #loginButton:hover {
-            background-color: #0056b3;
-        }
-        #loginMessage {
-            color: red;
-            margin-top: 10px;
-        }
-        .login-logo {
-            width: 200px;
-            height: auto;
-            margin-bottom: 15px;
-        }
-
-        /* --- Stili Ricerca --- */
+        /* --- AREA DI RICERCA --- */
         .search-container { 
-            margin-bottom: 20px; 
-            padding: 15px; 
-            border: 1px solid #ccc; 
-            border-radius: 8px; 
-            background-color: #f0f8ff; /* Sfondo chiaro per i controlli */
+            background-color: var(--gray-light);
+            padding: 25px; 
+            border-radius: 16px; 
             display: flex; 
             flex-wrap: wrap; 
-            gap: 10px;
+            gap: 15px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 30px;
         }
-        input[type="text"] { 
-            padding: 10px; 
-            border: 2px solid #007bff; /* Bordo blu PPL */
-            border-radius: 8px; 
+
+        .search-container input[type="text"] { 
+            padding: 12px 15px; 
+            border: 2px solid #cbd5e1; 
+            border-radius: 10px; 
             font-size: 16px; 
             flex-grow: 1; 
-            min-width: 200px; 
-            background-color: #f0f8ff;
-            color: #333;
-        }
-        
-        /* Stile pulsanti generici (Cerca, Reset) */
-        button { 
-            padding: 10px 15px; 
-            background-color: #007bff; 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-size: 16px; 
-            transition: background-color 0.3s ease;
-        }
-        button:hover { 
-            background-color: #0056b3; 
-        }
-        #resetButton { 
-            background-color: #dc3545; /* Rosso errore PPL */
-        }
-        #resetButton:hover { 
-            background-color: #c82333; 
+            min-width: 250px; 
+            transition: all 0.3s ease;
         }
 
-        /* --- Stili Risultati --- */
-        #results { margin-top: 20px; }
-        .quiz-result {
-            border: 1px solid #007bff; /* Bordo più visibile */
-            padding: 20px;
-            margin: 15px 0;
+        .search-container input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 114, 255, 0.1);
+        }
+
+        .search-container button {
+            padding: 0 30px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: var(--white);
+            font-weight: 700;
             border-radius: 10px;
-            background-color: #f0f8ff; /* Sfondo chiaro per il box */
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .quiz-result h3 { color: #333; margin-top: 0; }
-        .quiz-result p strong { color: #007bff; }
-        .quiz-result h4 { color: #333; }
-        .quiz-result ul { list-style: none; padding-left: 0; margin-top: 10px; }
-        .quiz-result li { margin-bottom: 8px; padding: 10px; border-radius: 6px; color: #333; }
-        .correct-answer {
-            background-color: #28a745 !important; /* Verde corretto PPL */
-            color: white !important;
-            font-weight: bold;
-            border: 1px solid #218838;
+
+        #resetButton { 
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
         }
-        .error { color: #dc3545; }
+
+        #resetButton:hover { 
+            background-color: #e2e8f0;
+            color: var(--danger);
+        }
+
+        /* --- RISULTATI --- */
+        .quiz-result {
+            border: 1px solid #e2e8f0;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 16px;
+            background-color: var(--white);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .quiz-result:hover { transform: scale(1.01); }
+
         .subject-tag {
-            display: inline-block;
-            background-color: #f39c12; /* Arancione PPL */
+            background: linear-gradient(90deg, #f39c12, #e67e22);
             color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.9em;
-            font-weight: bold;
-            margin-bottom: 10px;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            display: inline-block;
         }
 
-        /* --- Stili Copyright (Adattati allo stile PPL) --- */
+        .quiz-result h3 { color: var(--primary); margin: 0 0 10px 0; font-size: 1.1rem; }
+        .quiz-result p { line-height: 1.6; color: #334155; }
+
+        .quiz-result ul { list-style: none; padding: 0; margin-top: 15px; }
+        .quiz-result li { 
+            margin-bottom: 10px; 
+            padding: 12px 15px; 
+            border-radius: 10px; 
+            background-color: #f8fafc;
+            border: 1px solid #f1f5f9;
+            color: #475569;
+        }
+
+        .correct-answer {
+            background-color: #ecfdf5 !important;
+            color: #065f46 !important;
+            border: 1px solid #10b981 !important;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .correct-answer::after {
+            content: "✓";
+            position: absolute;
+            right: 15px;
+        }
+
+        /* --- COPYRIGHT --- */
         #copyright {
-            margin-top: 20px;
-            padding: 10px;
-            font-size: 0.85em;
-            color: #d3d3d3; /* Grigio chiaro PPL */
+            margin: 30px auto;
+            font-size: 0.85rem;
+            color: #94a3b8;
             text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
             width: 90%;
-            max-width: 1200px;
-            box-sizing: border-box;
-            animation: fadeIn 1s ease 0.5s forwards;
-            opacity: 0;
-            margin-bottom: 20px; /* Spazio extra in fondo alla pagina */
-        }
-        @keyframes fadeIn {
-            to { opacity: 1; }
+            max-width: 800px;
+            line-height: 1.5;
         }
 
-        /* Centratura generica del contenuto (funziona ora che flex-direction è column) */
-        .main-container, #loginScreen, #copyright {
-            align-self: center;
+        /* ANIMAZIONI */
+        @keyframes zoomIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
+
+        .main-container, #loginScreen, #copyright { align-self: center; }
+
     </style>
 </head>
 <body>
     
     <div id="loginScreen">
-        <img src="https://i.ibb.co/PHHxChW/unnamed.jpg" alt="Logo sito quiz ppl" class="login-logo"/>
-        <h2>Accesso al Database Quiz</h2>
+        <img src="https://i.ibb.co/PHHxChW/unnamed.jpg" alt="Logo Aeroclub Varese" class="login-logo"/>
+        <h2>Database Quiz PPL</h2>
         <input type="text" id="username" class="login-input" placeholder="Username">
         <input type="password" id="password" class="login-input" placeholder="Password">
-        <button id="loginButton" onclick="handleLogin()">Accedi</button>
-        <p id="loginMessage"></p>
+        <button id="loginButton" onclick="handleLogin()">Accedi al Portale</button>
+        <p id="loginMessage" style="color: var(--danger); margin-top: 15px; font-size: 0.9rem; font-weight: 600;"></p>
     </div>
 
     <div class="main-container" id="mainContent">
-        <h1>Ricerca Domande Quiz PPL - Aeroclub Varese</h1>
+        <h1>Ricerca Domande Quiz PPL</h1>
         
         <div class="search-container">
-            <input type="text" id="searchText" placeholder="Cerca per Testo della Domanda">
-            <input type="text" id="searchId" placeholder="Cerca per ID Domanda (es. 1001)">
+            <input type="text" id="searchText" placeholder="Cerca parole nel testo della domanda...">
+            <input type="text" id="searchId" placeholder="ID Domanda (es. 1001)">
             <button onclick="handleSearch()">Cerca</button>
             <button id="resetButton" onclick="resetSearch()">Reset</button>
         </div>
 
         <div id="results">
-            <p>Caricamento dati in corso...</p>
-        </div>
+            </div>
     </div>
 
     <footer id="copyright">
-        © 2025 by A.D per Aeroclub di Varese. Tutti i diritti riservati. Le informazioni e i contenuti di questo quiz sono protetti da copyright. È vietata la riproduzione non autorizzata.
+        © 2026 by A.D per <strong>Aeroclub di Varese</strong>. <br>
+        Tutti i diritti riservati. Le informazioni e i contenuti sono protetti da copyright.
     </footer>
 
     <script>
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7nj9UrBloRfIDxZkRUkxBu1neSuPIyaR4EjBWj90BLyDK3VkOBeqZSxe2pb1jwkE7mIEelHXhzayP/pub?output=csv';
         let quizData = [];
 
-        // --- 1. LOGICA DI ACCESSO E PROTEZIONE ---
-        
-        // Blocca il tasto destro del mouse e i tasti di sviluppo (F12, Ctrl+Shift+I/J)
+        // Protezione tasti e click destro
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.addEventListener('keydown', event => {
             if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && (event.key === 'I' || event.key === 'J'))) {
@@ -254,182 +294,99 @@
             }
         });
 
-        // Aggiungi l'evento "Enter" sui campi di input
-        document.getElementById('username').addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                handleLogin();
-            }
-        });
-
-        document.getElementById('password').addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                handleLogin();
-            }
+        // Invio con tasto Enter
+        [document.getElementById('username'), document.getElementById('password')].forEach(el => {
+            el.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
         });
         
         function handleLogin() {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const message = document.getElementById('loginMessage');
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value.trim();
+            const msg = document.getElementById('loginMessage');
 
-            // Credenziali fisse: allievo / allievo
-            if (username === 'allievo' && password === 'allievo') {
+            if (u === 'allievo' && p === 'allievo') {
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'block';
-                // Avvia il caricamento dei dati solo dopo il login
                 loadCSV(); 
-                document.getElementById('copyright').style.display = 'block'; // Mostra il copyright
             } else {
-                message.textContent = 'Credenziali non valide. Riprova.';
-                document.getElementById('password').value = ''; // Pulisce la password
+                msg.textContent = 'Credenziali non valide. Riprova.';
+                document.getElementById('password').value = '';
             }
-        }
-
-        // --- 2. LOGICA DI PARSING E RICERCA ---
-
-        function parseCSV(csv) {
-            const CSV_DELIMITER_REGEX = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/g;
-            const lines = csv.split('\n').filter(line => line.trim() !== '');
-            const data = [];
-            
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i];
-                let columns = line.split(CSV_DELIMITER_REGEX);
-                columns = columns.map(col => col.replace(/^"|"$/g, '').trim());
-
-                if (columns.length >= 8) {
-                    data.push(columns);
-                }
-            }
-            return data;
         }
 
         async function loadCSV() {
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '<p style="color: #007bff;">Caricamento dei dati in corso...</p>';
+            const res = document.getElementById('results');
+            res.innerHTML = '<p style="text-align:center; color: var(--primary);">Inizializzazione database aeronautico...</p>';
             try {
                 const response = await fetch(CSV_URL);
-                if (!response.ok) {
-                    throw new Error(`Errore di rete: ${response.statusText}. Assicurati che l'URL sia pubblicamente accessibile.`);
-                }
                 const csvText = await response.text();
                 quizData = parseCSV(csvText);
-
-                if (quizData.length > 0) {
-                    resultsDiv.innerHTML = `<p style="color: #28a745; font-weight: 600;">Dati caricati con successo! (${quizData.length} domande disponibili). Pronta per la ricerca.</p>`;
-                } else {
-                     resultsDiv.innerHTML = `<p class="error">Dati caricati, ma nessuna riga di quiz trovata. Verifica la struttura del file e il delimitatore.</p>`;
-                }
-                
-            } catch (error) {
-                resultsDiv.innerHTML = `<p class="error">⚠️ Errore nel caricamento del file CSV: ${error.message}. Controlla i permessi del link.</p>`;
-                console.error("Errore CSV:", error);
+                res.innerHTML = `<p style="text-align:center; color: var(--success); font-weight:600;">Sistema Pronto. ${quizData.length} domande caricate.</p>`;
+            } catch (e) {
+                res.innerHTML = '<p class="error">Errore di connessione al database.</p>';
             }
         }
 
+        function parseCSV(csv) {
+            const regex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/g;
+            return csv.split('\n').filter(l => l.trim() !== '').map(line => {
+                return line.split(regex).map(col => col.replace(/^"|"$/g, '').trim());
+            }).filter(col => col.length >= 8);
+        }
+
         function handleSearch() {
-            const searchText = document.getElementById('searchText').value.trim().toLowerCase();
-            const searchId = document.getElementById('searchId').value.trim().replace('#', '').toLowerCase();
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '';
+            const txt = document.getElementById('searchText').value.trim().toLowerCase();
+            const id = document.getElementById('searchId').value.trim().replace('#', '').toLowerCase();
+            const resDiv = document.getElementById('results');
+            resDiv.innerHTML = '';
 
-            if (!searchText && !searchId) {
-                resultsDiv.innerHTML = '<p style="color: #007bff;">Per favore, inserisci il testo o l\'ID della domanda per iniziare la ricerca.</p>';
-                return;
-            }
+            if (!txt && !id) return;
 
-            if (quizData.length === 0) {
-                 resultsDiv.innerHTML = '<p class="error">Dati del quiz non ancora caricati o caricamento fallito. Riprova o verifica il link.</p>';
-                 return;
-            }
-            
-            let foundResults = [];
+            const filtered = quizData.filter(row => {
+                const rowId = row[6] ? row[6].replace('#', '').trim().toLowerCase() : '';
+                const rowTxt = row[0] ? row[0].toLowerCase() : '';
+                return id ? rowId === id : rowTxt.includes(txt);
+            });
 
-            if (searchId) {
-                foundResults = quizData.filter(row => {
-                    const questionId = row[6] ? row[6].replace('#', '').trim().toLowerCase() : '';
-                    return questionId === searchId;
-                });
-            } else if (searchText) {
-                 foundResults = quizData.filter(row => {
-                    const questionText = row[0] ? row[0].toLowerCase() : '';
-                    return questionText.includes(searchText);
-                });
-            }
-
-            if (foundResults.length > 0) {
-                foundResults.forEach(row => {
-                    displayResult(row, resultsDiv);
-                });
+            if (filtered.length > 0) {
+                filtered.forEach(row => displayResult(row, resDiv));
             } else {
-                resultsDiv.innerHTML = '<p style="color: #007bff;">Nessuna domanda trovata con i criteri di ricerca specificati.</p>';
+                resDiv.innerHTML = '<p style="text-align:center;">Nessun risultato trovato.</p>';
             }
         }
 
         function resetSearch() {
             document.getElementById('searchText').value = '';
             document.getElementById('searchId').value = '';
-            document.getElementById('results').innerHTML = `<p style="color: #28a745; font-weight: 600;">Dati caricati con successo! (${quizData.length} domande disponibili). Inserisci un nuovo criterio di ricerca.</p>`;
+            document.getElementById('results').innerHTML = `<p style="text-align:center; color: var(--success);">Database pronto per una nuova ricerca.</p>`;
         }
 
         function displayResult(row, container) {
-            // Struttura colonne: 0:Domanda, 1:Risp A, 2:Risp B, 3:Risp C, 4:Risp D, 5:Indice Corretto (0-3), 6:ID, 7:Materia
-            const questionText = row[0];
-            const answers = [row[1], row[2], row[3], row[4]];
+            const correctIdx = parseInt(row[5], 10);
+            const resDiv = document.createElement('div');
+            resDiv.className = 'quiz-result';
             
-            // Logica Indice Corretto a base 0
-            const correctIndexRaw = row[5] ? row[5].trim() : '';
-            const correctIndex = parseInt(correctIndexRaw, 10);
-            
-            const questionId = row[6] ? row[6].replace('#', '').trim() : 'N/D';
-            const subject = row[7] ? row[7].trim() : 'Materia Sconosciuta';
-            
-            const isValidIndex = correctIndex >= 0 && correctIndex <= 3;
-
-            const resultDiv = document.createElement('div');
-            resultDiv.className = 'quiz-result';
-
-            let htmlContent = `
-                <div class="subject-tag">${subject}</div>
-                <h3>Domanda ID: #${questionId}</h3>
-                <p><strong>Testo:</strong> ${questionText}</p>
-                <h4>Risposte:</h4>
-                <ul>
-            `;
-
-            const answerLabels = ['A', 'B', 'C', 'D']; 
-            
-            if (!isValidIndex) {
-                 htmlContent += `<p style="color: orange; font-weight: bold;">ATTENZIONE: Indice di risposta corretta non valido (${correctIndexRaw}). Risposta non evidenziata.</p>`;
-            }
-
-            answers.forEach((answer, index) => {
-                const isCorrect = isValidIndex && index === correctIndex;
-                const correctLabel = isCorrect ? ' (RISPOSTA CORRETTA)' : '';
-                const liClass = isCorrect ? 'class="correct-answer"' : '';
-
-                if (answer) {
-                    htmlContent += `
-                        <li ${liClass}>
-                            ${answerLabels[index]}. ${answer.trim()} ${correctLabel}
-                        </li>
-                    `;
+            let answersHtml = '<ul>';
+            ['A', 'B', 'C', 'D'].forEach((label, i) => {
+                if (row[i+1]) {
+                    const isCorrect = i === correctIdx;
+                    answersHtml += `<li class="${isCorrect ? 'correct-answer' : ''}">${label}. ${row[i+1]}</li>`;
                 }
             });
+            answersHtml += '</ul>';
 
-            htmlContent += `
-                </ul>
+            resDiv.innerHTML = `
+                <div class="subject-tag">${row[7] || 'Generale'}</div>
+                <h3>ID Domanda: #${row[6]}</h3>
+                <p><strong>Domanda:</strong> ${row[0]}</p>
+                ${answersHtml}
             `;
-            resultDiv.innerHTML = htmlContent;
-            container.appendChild(resultDiv);
+            container.appendChild(resDiv);
         }
-        
-        // Nascondi inizialmente la sezione di ricerca e il copyright
-        document.addEventListener('DOMContentLoaded', () => {
-             document.getElementById('mainContent').style.display = 'none';
-             document.getElementById('copyright').style.display = 'none';
-        });
 
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('mainContent').style.display = 'none';
+        });
     </script>
 </body>
 </html>
