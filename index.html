@@ -241,21 +241,27 @@ body {
             cursor: not-allowed;
         }
 
-        .home-button {
-            margin-top: 20px;
-            padding: 12px 25px;
-            font-size: 1.2em;
-            color: white;
-            background-color: #28a745;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+.home-button {
+    margin-top: 25px;
+    padding: 15px 40px;
+    font-size: 1.1em;
+    font-weight: 700;
+    color: white;
+    background: linear-gradient(135deg, #1e293b, #334155); /* Grigio scuro professionale */
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
 
-        .home-button:hover {
-            background-color: #218838;
-        }
+.home-button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.2);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
 
         .result {
             font-size: 1.8em;
