@@ -684,6 +684,24 @@ body {
     </style>
 </head>
 <body>
+  <div id="language-switcher" style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; gap: 15px; background: rgba(30, 41, 59, 0.8); padding: 10px 15px; border-radius: 12px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.3);">
+    
+    <img src="https://flagcdn.com/w40/it.png" 
+         onclick="translateUI('it')" 
+         alt="Italiano" 
+         style="width: 35px; height: auto; cursor: pointer; border-radius: 4px; transition: transform 0.2s;" 
+         onmouseover="this.style.transform='scale(1.2)'" 
+         onmouseout="this.style.transform='scale(1)'">
+
+    <div style="width: 1px; height: 25px; background: rgba(255,255,255,0.2);"></div>
+
+    <img src="https://flagcdn.com/w40/gb.png" 
+         onclick="translateUI('en')" 
+         alt="English" 
+         style="width: 35px; height: auto; cursor: pointer; border-radius: 4px; transition: transform 0.2s;" 
+         onmouseover="this.style.transform='scale(1.2)'" 
+         onmouseout="this.style.transform='scale(1)'">
+</div>
     <div id="login" class="login-container">
         <div class="login-box">
             <img src="https://i.ibb.co/7d1dv94j/Senza-titolo-2.jpg alt="Logo sito quiz ppl"/>
@@ -698,7 +716,7 @@ body {
     <div id="quiz-section" class="quiz-container" style="display: none;">
         <div class="download-section">
             <a href="https://drive.google.com/file/d/1Q_-1z_xR2OjHL8st6d3wFzQWgWHZVSCZ/view?usp=drive_link">
-                <span class="download-icon">📑</span> Scarica qui gli allegati per i quiz
+                <span class="download-icon">📖</span> Allegati Quiz - Quiz attachments
             </a>
         </div>
         <div id="filter-and-mode-selection">
@@ -763,7 +781,8 @@ body {
            
             <ul>
                 <li>Aggiornamenti risposte errate 03/2026 </li>
-<li>Nuovo database in Inglese -- WORK IN PROGRESS --  </li>
+<li>English Language support added 04/2026  </li>
+<li>New English Database added -- WORK IN PROGRESS 04/2026--  </li>
             </ul>
             <p>Data ultimo aggiornamento: <span id="last-app-update-date-display"></span></p>
             <button onclick="closeUpdateNotification()">Ho capito!</button>
@@ -773,7 +792,7 @@ body {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script>
         // Data dell'ultimo aggiornamento dell'applicazione (modifica questa data ad ogni aggiornamento significativo)
-        const LAST_APP_UPDATE_DATE = '2026-01-07'; // Formato YYYY-MM-DD
+        const LAST_APP_UPDATE_DATE = '2026-04-01'; // Formato YYYY-MM-DD
 
         // Costanti per il numero di domande in modalità esame per ogni materia
         const EXAM_QUESTION_COUNTS = {
@@ -1448,6 +1467,69 @@ function resetQuiz() {
     updateProgress(); // Aggiorna la visualizzazione del progresso
     updateFlaggedCount(); // Aggiorna il contatore delle domande flaggate
     updateNavigator(); // Aggiorna il navigatore per mostrare lo stato iniziale
+}
+const dictionary = {
+    it: {
+        loginTitle: "Login",
+        userPh: "Username",
+        passPh: "Password",
+        loginBtn: "Accedi",
+        errorMsg: "Username o password errati",
+        labelSub: "Seleziona la materia: ",
+        optDef: "Seleziona qui la materia ➡️",
+        searchBtn: "Ricerca Domande 🔍",
+        modeTitle: "Scegli la modalità:",
+        studyBtn: "Modalità Studio 📖",
+        examBtn: "Modalità Esame 🎓",
+        prev: "Indietro",
+        next: "Avanti",
+        finish: "Termina Quiz",
+        home: "Home"
+    },
+    en: {
+        loginTitle: "Login",
+        userPh: "Username",
+        passPh: "Password",
+        loginBtn: "Sign In",
+        errorMsg: "Invalid username or password",
+        labelSub: "Select Subject: ",
+        optDef: "Select subject here ➡️",
+        searchBtn: "Search Questions 🔍",
+        modeTitle: "Select Mode:",
+        studyBtn: "Study Mode 📖",
+        examBtn: "Exam Mode 🎓",
+        prev: "Back",
+        next: "Next",
+        finish: "Finish Quiz",
+        home: "Home"
+    }
+};
+
+function translateUI(lang) {
+    const t = dictionary[lang];
+    
+    // Traduzione Login
+    if(document.querySelector("#login h2")) document.querySelector("#login h2").textContent = t.loginTitle;
+    if(document.getElementById("username")) document.getElementById("username").placeholder = t.userPh;
+    if(document.getElementById("password")) document.getElementById("password").placeholder = t.passPh;
+    if(document.querySelector("#login button")) document.querySelector("#login button").textContent = t.loginBtn;
+    if(document.getElementById("error-message")) document.getElementById("error-message").textContent = t.errorMsg;
+
+    // Traduzione Filtri
+    const label = document.querySelector(".filter-container label"); if(label) label.textContent = t.labelSub;
+    const opt = document.querySelector("#subject-select option[value='']"); if(opt) opt.textContent = t.optDef;
+    const sBtn = document.querySelector(".search-button-link button"); if(sBtn) sBtn.textContent = t.searchBtn;
+
+    // Traduzione Modalità
+    const mH3 = document.querySelector("#mode-selection-container h3"); if(mH3) mH3.textContent = t.modeTitle;
+    const stdBtn = document.querySelector("#mode-selection-container button:first-of-type"); if(stdBtn) stdBtn.innerHTML = t.studyBtn;
+    const exBtn = document.getElementById("examModeButton"); if(exBtn) exBtn.innerHTML = t.examBtn;
+
+    // Traduzione Bottoni Quiz
+    if(document.getElementById("prev")) document.getElementById("prev").textContent = t.prev;
+    if(document.getElementById("next")) document.getElementById("next").textContent = t.next;
+    if(document.getElementById("finish")) document.getElementById("finish").textContent = t.finish;
+    const hBtn = document.querySelector(".home-button"); if(hBtn) hBtn.textContent = t.home;
 }
     </script>
         <footer style="
