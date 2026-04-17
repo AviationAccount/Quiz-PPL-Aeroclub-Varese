@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - Quiz PPL Aeroclub Varese</title>
+    <style>
+        :root {
+            --primary: #0072ff;
+            --accent: #00d2ff;
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top right, #1e293b, #0f172a);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .faq-container {
+            max-width: 900px;
+            width: 100%;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .faq-item {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+
+        .faq-question {
+            padding: 25px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .faq-question:hover { background: rgba(255, 255, 255, 0.05); }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+            background: rgba(15, 23, 42, 0.4);
+        }
+
+        .faq-item.active .faq-answer { max-height: 2000px; transition: max-height 0.8s ease-in; }
+
+        .faq-answer-content { padding: 30px; line-height: 1.8; border-top: 1px solid rgba(255, 255, 255, 0.05); }
+
+        .lang-section { margin-bottom: 25px; position: relative; padding-left: 40px; }
+        .lang-section:last-child { margin-bottom: 0; }
+
+        .flag { position: absolute; left: 0; top: 4px; width: 25px; border-radius: 3px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+
+        .en-text { color: var(--text-muted); font-style: italic; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; margin-top: 15px; }
+
+        .icon-arrow { transition: transform 0.4s; color: var(--accent); }
+        .faq-item.active .icon-arrow { transform: rotate(180deg); }
+
+        .back-nav { text-align: center; margin-top: 50px; }
+        .back-btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white; padding: 15px 40px; border-radius: 12px;
+            text-decoration: none; font-weight: 800; text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3); transition: 0.3s;
+        }
+        .back-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0, 210, 255, 0.4); }
+
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; background: rgba(0,0,0,0.2); border-radius: 8px; overflow: hidden; }
+        td, th { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        th { color: var(--accent); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="faq-container">
+    <div class="header">
+        <h1>Centro Assistenza & FAQ</h1>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+            Vedo più domande. Come funziona il database? / How does the database work?
+            <span class="icon-arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+            <div class="faq-answer-content">
+                <div class="lang-section">
+                    <img src="https://flagcdn.com/w40/it.png" class="flag">
+                    Il database è suddiviso in database italiano ed inglese. Quello italiano è suddiviso in domande "ufficiali" indicate con 4 cifre (es. #1001). Le domande identificate da 5 cifre (es. #10001) sono domande più vecchie ugualmente impiegate da Aeroclub Varese.
+                </div>
+                <div class="lang-section en-text">
+                    <img src="https://flagcdn.com/w40/gb.png" class="flag">
+                    The database is divided into Italian and English sections. The Italian one includes "official" questions with 4 digits (e.g., #1001). Questions with 5 digits (e.g., #10001) are older questions still utilized by Aeroclub Varese.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+            Domanda errata o incompleta? / Wrong or incomplete question?
+            <span class="icon-arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+            <div class="faq-answer-content">
+                <div class="lang-section">
+                    <img src="https://flagcdn.com/w40/it.png" class="flag">
+                    Riporta la problematica al tuo istruttore teorico. Verrà prontamente modificata nel sistema.
+                </div>
+                <div class="lang-section en-text">
+                    <img src="https://flagcdn.com/w40/gb.png" class="flag">
+                    Report the issue to your ground instructor. It will be promptly corrected in the system.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+            Test presso Enac / Austrocontrol? / Enac or Austrocontrol exam?
+            <span class="icon-arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+            <div class="faq-answer-content">
+                <div class="lang-section">
+                    <img src="https://flagcdn.com/w40/it.png" class="flag">
+                    Il nostro consiglio è quello di integrare app come QuizPpl, a pagamento e reperibili online, per la maggior fedeltà con le domande poste durante gli esami ministeriali.
+                </div>
+                <div class="lang-section en-text">
+                    <img src="https://flagcdn.com/w40/gb.png" class="flag">
+                    We suggest integrating paid apps like QuizPpl, available online, for higher accuracy regarding the specific questions asked during official ministerial exams.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+            Dove trovo gli allegati? / Where can I find the attachments?
+            <span class="icon-arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+            <div class="faq-answer-content">
+                <div class="lang-section">
+                    <img src="https://flagcdn.com/w40/it.png" class="flag">
+                    Puoi accedere agli allegati cliccando sul link "Allegati Quiz" presente nella parte superiore della schermata principale dopo aver effettuato il login.
+                </div>
+                <div class="lang-section en-text">
+                    <img src="https://flagcdn.com/w40/gb.png" class="flag">
+                    You can access the attachments by clicking the "Allegati Quiz" link located at the top of the main screen after logging in.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+            Il database è aggiornato? / Is the database updated?
+            <span class="icon-arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+            <div class="faq-answer-content">
+                <div class="lang-section">
+                    <img src="https://flagcdn.com/w40/it.png" class="flag">
+                    Il database viene mantenuto aggiornato il più possibile basandosi sui feedback degli allievi. Indica al tuo istruttore le domande incontrate durante l'esame ministeriale per permetterne l'inserimento.
+                </div>
+                <div class="lang-section en-text">
+                    <img src="https://flagcdn.com/w40/gb.png" class="flag">
+                    The database is kept as up-to-date as possible based on student feedback. Please inform your instructor about questions encountered during ministerial exams so they can be added.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+            Funziona offline? / Does it work offline?
+            <span class="icon-arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+            <div class="faq-answer-content">
+                <div class="lang-section">
+                    <img src="https://flagcdn.com/w40/it.png" class="flag">
+                    Al momento l'applicazione non può essere impiegata offline. Questa funzione verrà resa disponibile in seguito.
+                </div>
+                <div class="lang-section en-text">
+                    <img src="https://flagcdn.com/w40/gb.png" class="flag">
+                    Currently, the application cannot be used offline. This feature will be released in the future.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+            Struttura dell'esame / Exam structure
+            <span class="icon-arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+            <div class="faq-answer-content">
+                <div class="lang-section">
+                    <img src="https://flagcdn.com/w40/it.png" class="flag">
+                    <strong>Numero domande per materia:</strong>
+                    <table>
+                        <tr><td>Regolamentazione</td><td>20</td></tr>
+                        <tr><td>Nozioni generali (Aeromobili)</td><td>20</td></tr>
+                        <tr><td>Prestazioni e Pianificazione</td><td>12</td></tr>
+                        <tr><td>Fattore umano</td><td>12</td></tr>
+                        <tr><td>Meteorologia</td><td>20</td></tr>
+                        <tr><td>Navigazione</td><td>20</td></tr>
+                        <tr><td>Principi del Volo</td><td>12</td></tr>
+                        <tr><td>Procedure operative</td><td>8</td></tr>
+                        <tr><td>Comunicazioni</td><td>8</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+            Percentuali di superamento / Passing scores
+            <span class="icon-arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+            <div class="faq-answer-content">
+                <div class="lang-section">
+                    <img src="https://flagcdn.com/w40/it.png" class="flag">
+                    La percentuale per il superamento di una <strong>singola materia</strong> ministeriale è il <strong>75%</strong>.<br>
+                    Per il superamento di questo <strong>quiz online</strong> e dei <strong>test interni</strong> di Aeroclub Varese, è richiesto l'<strong>80%</strong>.
+                </div>
+                <div class="lang-section en-text">
+                    <img src="https://flagcdn.com/w40/gb.png" class="flag">
+                    The passing score for a <strong>single ministerial subject</strong> is <strong>75%</strong>.<br>
+                    To pass this <strong>online quiz</strong> and the <strong>internal tests</strong> at Aeroclub Varese, a score of <strong>80%</strong> is required.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="back-nav">
+        <a href="index.html" class="back-btn">Torna al Simulatore / Back to Quiz</a>
+    </div>
+</div>
+
+<script>
+    function toggleFaq(element) {
+        const item = element.parentElement;
+        item.classList.toggle('active');
+        
+        // Chiude gli altri automaticamente
+        document.querySelectorAll('.faq-item').forEach(other => {
+            if (other !== item) other.classList.remove('active');
+        });
+    }
+</script>
+
+</body>
+</html>
