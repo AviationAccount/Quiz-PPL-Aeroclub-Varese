@@ -13,198 +13,64 @@
         body { 
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
             background: linear-gradient(135deg, #001f3f 0%, #003366 100%); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
-            color: #333;
-            padding: 20px;
-            box-sizing: border-box;
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box;
         }
-
         .reg-container { 
-            background: rgba(255, 255, 255, 0.95); 
-            backdrop-filter: blur(10px); 
-            border-radius: 20px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3); 
-            width: 100%; 
-            max-width: 500px; 
-            text-align: center;
-            animation: fadeIn 0.6s ease-out; 
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            overflow: hidden; 
+            background: rgba(255, 255, 255, 0.95); border-radius: 20px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3); width: 100%; max-width: 500px; 
+            text-align: center; overflow: hidden; animation: fadeIn 0.6s ease-out;
         }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .header-image { width: 100%; height: auto; border-bottom: 2px solid #ffcc00; }
+        .form-content { padding: 30px 40px; }
+        h2 { color: #003366; margin: 0; font-size: 1.5em; }
+        .subtitle { font-size: 0.85em; color: #666; margin-bottom: 20px; display: block; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 14px; background: #003366; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; text-transform: uppercase; margin-top: 15px; }
+        .back-link { display: block; margin-top: 15px; font-size: 0.9em; color: #003366; text-decoration: none; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .header-image {
-            width: 100%;
-            height: auto;
-            display: block;
-            border-bottom: 2px solid #ffcc00; 
-        }
-
-        .form-content {
-            padding: 30px 40px 40px 40px; 
-        }
-
-        h2 { 
-            color: #003366; 
-            font-size: 1.5em; 
-            margin: 0 0 5px 0;
-            font-weight: 700;
-        }
-
-        .subtitle {
-            font-size: 0.85em;
-            color: #666;
-            margin-bottom: 25px;
-            display: block;
-        }
-
-        input { 
-            width: 100%; 
-            padding: 12px 15px; 
-            margin: 8px 0; 
-            border: 1px solid #ddd; 
-            border-radius: 8px; 
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-            font-size: 14px;
-        }
-
-        input:focus {
-            border-color: #003366;
-            outline: none;
-            box-shadow: 0 0 8px rgba(0, 51, 102, 0.2);
-        }
-
-        button { 
-            width: 100%; 
-            padding: 14px; 
-            background-color: #003366; 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 16px;
-            margin-top: 20px; 
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        button:hover { 
-            background-color: #001f3f; 
-            transform: translateY(-2px);
-        }
-
-        .back-link { 
-            display: block; 
-            margin-top: 20px; 
-            font-size: 0.9em; 
-            color: #003366; 
-            text-decoration: none; 
-        }
-
-        /* STILE MODAL SUCCESSO */
+        /* MODAL SUCCESSO */
         #success-modal {
-            display: none; 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
-            background: rgba(0, 31, 63, 0.96); 
-            z-index: 10000; 
-            justify-content: center; 
-            align-items: center; 
-            backdrop-filter: blur(8px);
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0, 31, 63, 0.97); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(5px);
         }
-
-        .modal-content {
-            background: white;
-            padding: 35px;
-            border-radius: 25px;
-            max-width: 420px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-        }
-
-        .credenziali-box {
-            background: #f1f5f9;
-            padding: 20px;
-            border-radius: 15px;
-            margin: 20px 0;
-            text-align: left;
-            border-left: 6px solid #00d2ff;
-        }
-
-        .credenziali-box p { margin: 0; }
-        .label-creds { font-size: 0.75em; color: #64748b; text-transform: uppercase; font-weight: bold; }
-        .value-creds { font-size: 1.1em; color: #1e293b; font-weight: bold; margin-bottom: 12px !important; word-break: break-all; }
-
-        #error-message {
-            color: #d9534f;
-            font-size: 0.85em;
-            margin-top: 10px;
-            display: none;
-            background: #fdf2f2;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #f5c6cb;
-        }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; }
+        .creds-box { background: #f1f5f9; padding: 15px; border-radius: 12px; margin: 20px 0; text-align: left; border-left: 5px solid #00d2ff; }
+        .label { font-size: 0.75em; color: #64748b; text-transform: uppercase; font-weight: bold; margin: 0; }
+        .value { font-size: 1.1em; color: #1e293b; font-weight: bold; margin: 0 0 10px 0; }
     </style>
 </head>
 <body>
 
 <div id="success-modal">
     <div class="modal-content">
-        <h2 style="color: #10b981;">✅ Registrazione Completata!</h2>
-        <p style="font-size: 0.9em; color: #64748b; margin-top: 5px;">Registration successfully completed.</p>
-        
-        <p style="margin-top: 20px; font-weight: bold;">Salva queste credenziali ora:</p>
-        <p style="font-size: 0.85em; color: #64748b; margin-top: -12px;">Save these credentials now:</p>
-        
-        <div class="credenziali-box">
-            <p class="label-creds">Username / Email</p>
-            <p id="display-user" class="value-creds"></p>
-            
-            <p class="label-creds">Password</p>
-            <p id="display-pass" class="value-creds"></p>
+        <h2 style="color: #10b981;">✅ Registrazione OK!</h2>
+        <p style="font-size: 0.9em; color: #666;">Account creato. Salva i dati per il login:</p>
+        <div class="creds-box">
+            <p class="label">Username per il Login</p>
+            <p id="display-user" class="value"></p>
+            <p class="label">Password</p>
+            <p id="display-pass" class="value" style="margin-bottom:0;"></p>
         </div>
-
-        <p style="font-size: 0.85em; color: #1e293b; line-height: 1.4;">
-            Fai uno screenshot prima di proseguire.<br>
-            <span style="color: #64748b; font-style: italic;">Take a screenshot before proceeding.</span>
-        </p>
-
+        <p style="font-size: 0.8em; color: #333;">Fai uno screenshot ora!<br><i>Take a screenshot now!</i></p>
         <button onclick="window.location.href='index.html'">Vai al Login / Go to Login</button>
     </div>
 </div>
 
 <div class="reg-container">
-    <img src="https://i.ibb.co/xSSf1gjT/Gemini-Generated-Image-i19j74i19j74i19j.png" alt="Header" class="header-image">
-    
+    <img src="https://i.ibb.co/xSSf1gjT/Gemini-Generated-Image-i19j74i19j74i19j.png" class="header-image">
     <div class="form-content">
         <h2>Nuovo Account Quiz</h2>
-        <span class="subtitle">Create your PPL Quiz Account</span>
-        
-        <input type="text" id="nome" placeholder="Nome / First Name">
-        <input type="text" id="cognome" placeholder="Cognome / Last Name">
-        <input type="email" id="email-reale" placeholder="Email Personale (es: mario@gmail.com)">
+        <span class="subtitle">Aeroclub Varese Registration</span>
+        <input type="text" id="nome" placeholder="Nome">
+        <input type="text" id="cognome" placeholder="Cognome">
+        <input type="email" id="email-reale" placeholder="La tua Email reale (per recupero psw)">
         <input type="number" id="corso" placeholder="Numero Corso PPL (95-170)">
-        <input type="text" id="username" placeholder="Scegli Username / Choose Username">
+        <input type="text" id="username" placeholder="Username (per fare il Login)">
         <input type="password" id="password" placeholder="Scegli Password (min. 6 car.)">
-        
-        <div id="error-message"></div>
-
-        <button onclick="handleRegister()">Crea Account / Create Account</button>
-        <a href="index.html" class="back-link">← Torna al Login / Back to Login</a>
+        <button onclick="handleRegister()">Crea Account</button>
+        <a href="index.html" class="back-link">Torna al Login</a>
     </div>
 </div>
 
@@ -224,56 +90,38 @@
         const nome = document.getElementById('nome').value.trim();
         const cognome = document.getElementById('cognome').value.trim();
         const emailReale = document.getElementById('email-reale').value.trim();
-        const corsoInput = document.getElementById('corso').value.trim();
+        const corsoNum = parseInt(document.getElementById('corso').value);
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value;
-        const errMsg = document.getElementById('error-message');
 
-        const corsoNum = parseInt(corsoInput);
-        errMsg.style.display = "none";
-
-        if(!nome || !cognome || !emailReale || !corsoInput || !username || password.length < 6) {
-            alert("Compila tutti i campi correttamente (Password min. 6 caratteri).\nPlease fill all fields correctly (Password min. 6 chars).");
-            return;
-        }
-
-        if (isNaN(corsoNum) || corsoNum < 95 || corsoNum > 170) {
-            errMsg.innerHTML = "Numero corso non valido per la registrazione.<br>Invalid course number.";
-            errMsg.style.display = "block";
+        if(!nome || !cognome || !emailReale || !username || password.length < 6 || corsoNum < 95 || corsoNum > 170) {
+            alert("Controlla i dati: tutti i campi sono obbligatori, Corso 95-170, Password min. 6 car.");
             return;
         }
 
         try {
-            // Ora usiamo l'email reale inserita dall'utente per creare l'account Firebase
+            // REGISTRAZIONE SU FIREBASE AUTH CON EMAIL REALE
             const userCredential = await firebase.auth().createUserWithEmailAndPassword(emailReale, password);
             
-            // Salviamo tutti i dettagli, incluso l'username scelto, nel database Firestore
+            // SALVATAGGIO DATI SU FIRESTORE (incluso lo username per il login futuro)
             await db.collection("utenti").doc(userCredential.user.uid).set({
-                nome: nome,
-                cognome: cognome,
+                nome, cognome,
                 emailPersonale: emailReale,
-                corsoPPL: corsoNum,
                 username: username,
+                corsoPPL: corsoNum,
                 dataRegistrazione: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            // Mostra Modal di successo con il riepilogo
-            // Nota: Visualizziamo l'email reale come "Username/Email" nel recap
-            document.getElementById('display-user').innerText = emailReale;
+            // MOSTRA IL RECAP (Diamo all'utente lo Username scelto, così sa cosa scrivere nel login)
+            document.getElementById('display-user').innerText = username;
             document.getElementById('display-pass').innerText = password;
             document.getElementById('success-modal').style.display = 'flex';
             
         } catch (error) {
-            if (error.code === 'auth/email-already-in-use') {
-                alert("Questa email è già associata a un account.\nThis email is already associated with an account.");
-            } else if (error.code === 'auth/invalid-email') {
-                alert("Formato email non valido.\nInvalid email format.");
-            } else {
-                alert("Errore / Error: " + error.message);
-            }
+            if (error.code === 'auth/email-already-in-use') alert("Email già registrata.");
+            else alert("Errore: " + error.message);
         }
     }
 </script>
-
 </body>
 </html>
