@@ -48,12 +48,12 @@
         <h2 style="color: #10b981;">✅ Registrazione OK!</h2>
         <p style="font-size: 0.85em; color: #666; margin-top: 5px;">Registration successfully completed.</p>
         
-        <p style="margin-top: 20px; font-weight: bold; margin-bottom: 0;">Salva i tuoi dati ora:</p>
-        <p style="font-size: 0.8em; color: #666; margin-top: 0;">Save your credentials now:</p>
+        <p style="margin-top: 20px; font-weight: bold; margin-bottom: 0;">Salva le tue credenziali di accesso:</p>
+        <p style="font-size: 0.8em; color: #666; margin-top: 0;">Save your login credentials:</p>
         
         <div class="creds-box">
-            <p class="label">Username (per Login)</p>
-            <p id="display-user" class="value"></p>
+            <p class="label">Email (per Login)</p>
+            <p id="display-email" class="value"></p>
             
             <p class="label">Password</p>
             <p id="display-pass" class="value" style="margin-bottom:0;"></p>
@@ -78,7 +78,6 @@
         <input type="text" id="cognome" placeholder="Cognome / Last Name">
         <input type="email" id="email-reale" placeholder="Email Personale / Personal Email">
         <input type="number" id="corso" placeholder="Numero Corso PPL / PPL Course Number">
-        <input type="text" id="username" placeholder="Scegli Username / Choose Username">
         <input type="password" id="password" placeholder="Scegli Password / Choose Password (min. 6)">
         
         <button onclick="handleRegister()">Crea Account / Create Account</button>
@@ -103,10 +102,9 @@
         const cognome = document.getElementById('cognome').value.trim();
         const emailReale = document.getElementById('email-reale').value.trim();
         const corsoValue = document.getElementById('corso').value.trim();
-        const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value;
 
-        if(!nome || !cognome || !emailReale || !username || !corsoValue || password.length < 6) {
+        if(!nome || !cognome || !emailReale || !corsoValue || password.length < 6) {
             alert("Compila tutti i campi correttamente.\nPlease fill all fields correctly.");
             return;
         }
@@ -115,24 +113,24 @@
             // Crea account su Firebase Auth con Email reale
             const userCredential = await firebase.auth().createUserWithEmailAndPassword(emailReale, password);
             
-            // Salva dati su Firestore
+            // Salva dati su Firestore (usiamo email come username di riferimento)
             await db.collection("utenti").doc(userCredential.user.uid).set({
                 nome: nome,
                 cognome: cognome,
                 emailPersonale: emailReale,
-                username: username,
+                username: emailReale, // Lo username coincide con l'email
                 corsoPPL: corsoValue,
                 dataRegistrazione: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            // Popola e mostra il modal di successo
-            document.getElementById('display-user').innerText = username;
+            // Popola e mostra il modal di successo con la mail
+            document.getElementById('display-email').innerText = emailReale;
             document.getElementById('display-pass').innerText = password;
             document.getElementById('success-modal').style.display = 'flex';
             
         } catch (error) {
             if (error.code === 'auth/email-already-in-use') {
-                alert("Email o account già esistente.\nEmail or account already exists.");
+                alert("Email già registrata.\nEmail already exists.");
             } else {
                 alert("Errore / Error: " + error.message);
             }
