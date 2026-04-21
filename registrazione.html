@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creazione Account Aeroclub Varese Quiz</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <style>
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: linear-gradient(135deg, #001f3f 0%, #003366 100%); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            color: #333;
+            padding: 20px; /* Aggiunto padding per mobile */
+            box-sizing: border-box;
+        }
+
+        .reg-container { 
+            background: rgba(255, 255, 255, 0.9); /* Leggermente più opaco per leggerezza */
+            backdrop-filter: blur(10px); /* Effetto sfocatura sfondo */
+            border-radius: 20px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3); 
+            width: 100%; 
+            max-width: 500px; /* Leggermente più largo per ospitare l'immagine grande */
+            text-align: center;
+            animation: fadeIn 0.6s ease-out; 
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden; /* Importante per l'immagine smussata in alto */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Stile per l'immagine grande caricata */
+        .header-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-bottom: 2px solid #ffcc00; /* Linea oro Aeroclub */
+        }
+
+        .form-content {
+            padding: 30px 40px 40px 40px; /* Padding interno solo per il form */
+        }
+
+        h2 { 
+            color: #003366; 
+            font-size: 1.5em; 
+            margin-top: 0;
+            margin-bottom: 5px; 
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 0.85em;
+            color: #555;
+            margin-bottom: 25px;
+            font-weight: 400;
+            display: block;
+        }
+
+        input { 
+            width: 100%; 
+            padding: 12px 15px; 
+            margin: 8px 0; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        input:focus {
+            border-color: #003366;
+            outline: none;
+            box-shadow: 0 0 8px rgba(0, 51, 102, 0.2);
+            background-color: #fff;
+        }
+
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            background-color: #003366; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 16px;
+            margin-top: 20px; 
+            transition: background 0.3s, transform 0.2s;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        button:hover { 
+            background-color: #001f3f; 
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        button:active { transform: translateY(0); }
+
+        .back-link { 
+            display: block; 
+            margin-top: 20px; 
+            font-size: 0.9em; 
+            color: #003366; 
+            text-decoration: none; 
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover { color: #ffcc00; }
+
+        #error-message {
+            color: #d9534f;
+            font-size: 0.85em;
+            margin-top: 10px;
+            display: none;
+            font-weight: bold;
+            background: #fdf2f2;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+
+<div class="reg-container">
+    <img src="https://i.ibb.co/xSSf1gjT/Gemini-Generated-Image-i19j74i19j74i19j.png" alt="Aeroclub Varese Registration Header" class="header-image">
+    
+    <div class="form-content">
+        <h2>Creazione Account Aeroclub Varese Quiz</h2>
+        <span class="subtitle">Aeroclub Varese Quiz Account Creation</span>
+        
+        <input type="text" id="nome" placeholder="Nome / First Name">
+        <input type="text" id="cognome" placeholder="Cognome / Last Name">
+        <input type="email" id="email-reale" placeholder="Email (es: name@example.com)">
+        <input type="number" id="corso" placeholder="Numero Corso PPL / PPL Course Number">
+        <input type="text" id="username" placeholder="Scegli Username / Choose Username">
+        <input type="password" id="password" placeholder="Scegli Password (min. 6 car.) / Choose Password (min. 6 char.)">
+        
+        <div id="error-message"></div>
+
+        <button onclick="handleRegister()">Crea Account / Create Account</button>
+        <a href="index.html" class="back-link">← Torna al Login / Back to Login</a>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDqy6CFoufHVlqT94GdurCMzcmPFv-VprM",
+        authDomain: "quiz-ppl-varese.firebaseapp.com",
+        projectId: "quiz-ppl-varese",
+        storageBucket: "quiz-ppl-varese.firebasestorage.app",
+        messagingSenderId: "784406293571",
+        appId: "1:784406293571:web:dd28c5574910502891b8f6"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    async function handleRegister() {
+        const nome = document.getElementById('nome').value.trim();
+        const cognome = document.getElementById('cognome').value.trim();
+        const emailReale = document.getElementById('email-reale').value.trim();
+        const corsoInput = document.getElementById('corso').value.trim();
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        const errMsg = document.getElementById('error-message');
+
+        const corsoNum = parseInt(corsoInput);
+        errMsg.style.display = "none";
+
+        // Controllo campi / Fields check
+        if(!nome || !cognome || !emailReale || !corsoInput || !username || password.length < 6) {
+            alert("Compila tutti i campi correttamente / Please fill all fields correctly.");
+            return;
+        }
+
+        // Regola Corso Segreta / Secret Course Rule (95-170)
+        if (isNaN(corsoNum) || corsoNum < 95 || corsoNum > 170) {
+            errMsg.innerHTML = "I dati inseriti non corrispondono a un corso attivo.<br>The data entered does not correspond to an active course.";
+            errMsg.style.display = "block";
+            return;
+        }
+
+        const emailTecnica = username + "@varese.it";
+
+        try {
+            const userCredential = await firebase.auth().createUserWithEmailAndPassword(emailTecnica, password);
+            
+            await db.collection("utenti").doc(userCredential.user.uid).set({
+                nome: nome,
+                cognome: cognome,
+                emailPersonale: emailReale,
+                corsoPPL: corsoNum,
+                username: username,
+                dataRegistrazione: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            alert("Registrazione completata! / Registration completed!");
+            window.location.href = "index.html"; 
+            
+        } catch (error) {
+            if (error.code === 'auth/email-already-in-use') {
+                alert("Username già in uso / Username already in use.");
+            } else {
+                alert("Errore / Error: " + error.message);
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
