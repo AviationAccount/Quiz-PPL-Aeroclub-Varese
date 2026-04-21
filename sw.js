@@ -1,35 +1,143 @@
-const CACHE_NAME = 'quiz-store-v1.3.4'; // <--- CAMBIA QUESTO NUMERO OGNI VOLTA
-const ASSETS = [
-  '/Quiz-PPL-Aeroclub-Varese/',
-  '/Quiz-PPL-Aeroclub-Varese/index.html',
-  // Aggiungi qui il tuo file CSV se vuoi che funzioni offline!
-  // '/Quiz-PPL-Aeroclub-Varese/tuo-file-dati.csv' 
-];
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creazione Account Aeroclub Varese Quiz</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-// Installazione: crea la nuova cache
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-  );
-  self.skipWaiting(); // Forza l'attivazione immediata
-});
-
-// Attivazione: cancella le vecchie versioni della cache
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys().then((keyList) => {
-      return Promise.all(keyList.map((key) => {
-        if (key !== CACHE_NAME) {
-          return caches.delete(key);
+    <style>
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: linear-gradient(135deg, #001f3f 0%, #003366 100%); 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box;
         }
-      }));
-    })
-  );
-});
+        .reg-container { 
+            background: rgba(255, 255, 255, 0.95); border-radius: 20px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3); width: 100%; max-width: 500px; 
+            text-align: center; overflow: hidden; animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .header-image { width: 100%; height: auto; border-bottom: 2px solid #ffcc00; }
+        .form-content { padding: 30px 40px; }
+        h2 { color: #003366; margin: 0; font-size: 1.5em; }
+        .subtitle { font-size: 0.85em; color: #666; margin-bottom: 20px; display: block; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 14px; background: #003366; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; text-transform: uppercase; margin-top: 15px; }
+        .back-link { display: block; margin-top: 15px; font-size: 0.9em; color: #003366; text-decoration: none; }
 
-// Fetch: serve i file dalla cache
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((response) => response || fetch(e.request))
-  );
-});
+        /* MODAL SUCCESSO */
+        #success-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0, 31, 63, 0.97); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 420px; text-align: center; }
+        .creds-box { background: #f1f5f9; padding: 15px; border-radius: 12px; margin: 20px 0; text-align: left; border-left: 5px solid #00d2ff; }
+        .label { font-size: 0.7em; color: #64748b; text-transform: uppercase; font-weight: bold; margin: 0; }
+        .value { font-size: 1.1em; color: #1e293b; font-weight: bold; margin: 0 0 12px 0; word-break: break-all; }
+    </style>
+</head>
+<body>
+
+<div id="success-modal">
+    <div class="modal-content">
+        <h2 style="color: #10b981;">✅ Registrazione OK!</h2>
+        <p style="font-size: 0.85em; color: #666; margin-top: 5px;">Registration successfully completed.</p>
+        
+        <p style="margin-top: 20px; font-weight: bold; margin-bottom: 0;">Salva i tuoi dati ora:</p>
+        <p style="font-size: 0.8em; color: #666; margin-top: 0;">Save your credentials now:</p>
+        
+        <div class="creds-box">
+            <p class="label">Username (per Login)</p>
+            <p id="display-user" class="value"></p>
+            
+            <p class="label">Password</p>
+            <p id="display-pass" class="value" style="margin-bottom:0;"></p>
+        </div>
+
+        <p style="font-size: 0.85em; color: #333; line-height: 1.4;">
+            Fai uno screenshot prima di chiudere!<br>
+            <span style="color: #666; font-style: italic;">Take a screenshot before closing!</span>
+        </p>
+
+        <button onclick="window.location.href='index.html'">Vai al Login / Go to Login</button>
+    </div>
+</div>
+
+<div class="reg-container">
+    <img src="https://i.ibb.co/xSSf1gjT/Gemini-Generated-Image-i19j74i19j74i19j.png" class="header-image" alt="Aeroclub Varese">
+    <div class="form-content">
+        <h2>Nuovo Account Quiz</h2>
+        <span class="subtitle">PPL Quiz Account Creation</span>
+        
+        <input type="text" id="nome" placeholder="Nome / First Name">
+        <input type="text" id="cognome" placeholder="Cognome / Last Name">
+        <input type="email" id="email-reale" placeholder="Email Personale / Personal Email">
+        <input type="number" id="corso" placeholder="Numero Corso PPL / PPL Course Number">
+        <input type="text" id="username" placeholder="Scegli Username / Choose Username">
+        <input type="password" id="password" placeholder="Scegli Password / Choose Password (min. 6)">
+        
+        <button onclick="handleRegister()">Crea Account / Create Account</button>
+        <a href="index.html" class="back-link">← Torna al Login / Back to Login</a>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDqy6CFoufHVlqT94GdurCMzcmPFv-VprM",
+        authDomain: "quiz-ppl-varese.firebaseapp.com",
+        projectId: "quiz-ppl-varese",
+        storageBucket: "quiz-ppl-varese.firebasestorage.app",
+        messagingSenderId: "784406293571",
+        appId: "1:784406293571:web:dd28c5574910502891b8f6"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    async function handleRegister() {
+        const nome = document.getElementById('nome').value.trim();
+        const cognome = document.getElementById('cognome').value.trim();
+        const emailReale = document.getElementById('email-reale').value.trim();
+        const corsoValue = document.getElementById('corso').value.trim();
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+
+        if(!nome || !cognome || !emailReale || !username || !corsoValue || password.length < 6) {
+            alert("Compila tutti i campi correttamente.\nPlease fill all fields correctly.");
+            return;
+        }
+
+        try {
+            // Crea account su Firebase Auth con Email reale
+            const userCredential = await firebase.auth().createUserWithEmailAndPassword(emailReale, password);
+            
+            // Salva dati su Firestore
+            await db.collection("utenti").doc(userCredential.user.uid).set({
+                nome: nome,
+                cognome: cognome,
+                emailPersonale: emailReale,
+                username: username,
+                corsoPPL: corsoValue,
+                dataRegistrazione: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            // Popola e mostra il modal di successo
+            document.getElementById('display-user').innerText = username;
+            document.getElementById('display-pass').innerText = password;
+            document.getElementById('success-modal').style.display = 'flex';
+            
+        } catch (error) {
+            if (error.code === 'auth/email-already-in-use') {
+                alert("Email o account già esistente.\nEmail or account already exists.");
+            } else {
+                alert("Errore / Error: " + error.message);
+            }
+        }
+    }
+</script>
+</body>
+</html>
