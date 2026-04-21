@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quiz-store-v1.3.6'; // <--- CAMBIA QUESTO NUMERO OGNI VOLTA
+const CACHE_NAME = 'quiz-store-v1.3.7'; // <--- CAMBIA QUESTO NUMERO OGNI VOLTA
 const ASSETS = [
   '/Quiz-PPL-Aeroclub-Varese/',
   '/Quiz-PPL-Aeroclub-Varese/index.html',
