@@ -1,11 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#005596">
 
 <script>
+  const firebaseConfig = {
+  apiKey: "AIzaSyDqy6CFoufHVlqT94GdurCMzcmPFv-VprM",
+  authDomain: "quiz-ppl-varese.firebaseapp.com",
+  projectId: "quiz-ppl-varese",
+  storageBucket: "quiz-ppl-varese.firebasestorage.app",
+  messagingSenderId: "784406293571",
+  appId: "1:784406293571:web:dd28c5574910502891b8f6"
+};
 
+// Inizializza Firebase una sola volta
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.firestore();
+const auth = firebase.auth();
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js');
   }
@@ -759,7 +776,24 @@ body {
             <button onclick="login()">Accedi</button>
             <div id="error-message" class="error-message">Username o password errati</div>
         </div>
+        <div style="text-align: center; margin-top: 25px; font-family: 'Inter', sans-serif; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+    <p style="color: #ffffff; font-size: 0.95em; margin: 0; text-shadow: 0px 2px 4px rgba(0,0,0,0.5);">
+        Non sei ancora registrato? 
+        <a href="https://aviationaccount.github.io/Quiz-PPL-Aeroclub-Varese/registrazione.html" 
+           style="color: #00d2ff; font-weight: bold; text-decoration: none; border-bottom: 1.5px solid #00d2ff; padding-bottom: 2px;">
+           Registrati qui
+        </a>
+    </p>
+    <p style="color: #94a3b8; font-size: 0.85em; margin-top: 8px; font-style: italic;">
+        Not registered yet? 
+        <a href="https://aviationaccount.github.io/Quiz-PPL-Aeroclub-Varese/registrazione.html" 
+           style="color: #00d2ff; text-decoration: none; opacity: 0.9;">
+           Register here
+        </a>
+    </p>
+</div>
     </div>
+    
 
     <div id="quiz-section" class="quiz-container" style="display: none;">
         <div class="download-section">
@@ -872,26 +906,39 @@ body {
         };
 
         // Login functionality
-        const validUsername = 'allievo';
-        const validPassword = 'allievo';
+        async function login() {
+    const userField = document.getElementById('username').value;
+    const passField = document.getElementById('password').value;
+    const errorMsg = document.getElementById('error-message');
 
-        function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+    // Mostra un feedback visivo opzionale
+    errorMsg.style.display = 'none';
 
-            if (username === validUsername && password === validPassword) {
-                document.getElementById('login').style.display = 'none';
-                document.getElementById('quiz-section').style.display = 'block';
-                // Assicurati che il container del filtro sia visibile al login per la prima selezione
-                document.querySelector('.filter-container').style.display = 'block';
-                document.getElementById('mode-selection-container').style.display = 'none'; // Nascondi la selezione modalità
-                document.getElementById('quiz').style.display = 'none'; // Assicurati che il quiz sia nascosto all'inizio
-                loadCSVData();
-                showUpdateNotification(); // Mostra la notifica dopo il login
-            } else {
-                document.getElementById('error-message').style.display = 'block';
-            }
+    try {
+        // Firebase richiede un formato email. 
+        // Se l'allievo scrive "mario", noi lo trasformiamo in "mario@varese.it" automaticamente.
+        const email = userField.includes("@") ? userField : userField + "@varese.it";
+        
+        // Chiamata a Firebase
+        await firebase.auth().signInWithEmailAndPassword(email, passField);
+        
+        // Se il login ha successo, eseguiamo le tue funzioni originali per mostrare il quiz
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('quiz-section').style.display = 'block';
+        
+        // Carica i dati e mostra la notifica (le tue funzioni originali)
+        loadCSVData();
+        if (typeof showUpdateNotification === "function") {
+            showUpdateNotification();
         }
+        
+    } catch (error) {
+        // Se le credenziali non esistono su Firebase Console
+        errorMsg.style.display = 'block';
+        errorMsg.textContent = "Credenziali errate o utente non autorizzato.";
+        console.error("Errore Firebase:", error.code);
+    }
+}
         // Aggiungi l'evento "Enter" sui campi di input
         document.getElementById('username').addEventListener('keydown', function(event) {
             if (event.key === 'Enter') {
