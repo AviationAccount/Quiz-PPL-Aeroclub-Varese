@@ -9,7 +9,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 
     <script>
-        // CONFIGURAZIONE FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyDqy6CFoufHVlqT94GdurCMzcmPFv-VprM",
             authDomain: "quiz-ppl-varese.firebaseapp.com",
@@ -24,31 +23,23 @@
         }
 
         const auth = firebase.auth();
-        const LOGIN_URL = "https://aviationaccount.github.io/Quiz-PPL-Aeroclub-Varese/";
+        // URL della tua pagina principale su GitHub
+        const HOME_URL = "https://aviationaccount.github.io/Quiz-PPL-Aeroclub-Varese/index.html";
         let quizData = []; 
 
-        /**
-         * LA TUA NUOVA BARRIERA DI SICUREZZA
-         * Sostituisce ogni vecchio sistema di password.
-         */
         auth.onAuthStateChanged((user) => {
             const content = document.getElementById('protected-content');
             if (user) {
-                // Se l'utente è loggato con Firebase (da index.html), mostriamo tutto
                 if (content) content.style.display = 'block';
                 if (quizData.length === 0) loadCSV();
             } else {
-                // Se NON è loggato, la pagina resta bianca e torna al login
-                window.location.replace(LOGIN_URL);
+                window.location.replace(HOME_URL);
             }
         });
 
-        async function logout() {
-            try {
-                await auth.signOut();
-            } catch (error) {
-                window.location.replace(LOGIN_URL);
-            }
+        // Semplice funzione di navigazione
+        function goHome() {
+            window.location.href = HOME_URL;
         }
     </script>
 
@@ -59,7 +50,6 @@
             --dark-bg: #141E30;
             --dark-blue: #243B55;
             --success: #28a745;
-            --danger: #dc3545;
             --white: #ffffff;
             --text-dark: #1e293b;
             --gray-light: #f8fafc;
@@ -73,11 +63,7 @@
             min-height: 100vh;
         }
 
-        /* La pagina nasce "invisibile" per evitare che si veda il contenuto prima del controllo Firebase */
-        #protected-content { 
-            display: none; 
-            padding: 40px 0; 
-        }
+        #protected-content { display: none; padding: 40px 0; }
 
         .main-container {
             max-width: 1000px;
@@ -93,11 +79,17 @@
 
         .header-box { text-align: center; margin-bottom: 30px; position: relative; }
         
-        .btn-logout { 
-            position: absolute; top: 0; right: 0; background: #f1f5f9; 
-            border: 1px solid #ddd; padding: 8px 15px; border-radius: 8px; 
-            cursor: pointer; font-size: 0.8rem; font-weight: bold; color: var(--danger);
+        /* Nuovo stile pulsante HOME */
+        .btn-home { 
+            position: absolute; top: 0; left: 0; 
+            background: var(--primary); 
+            color: white; border: none; 
+            padding: 10px 18px; border-radius: 12px; 
+            cursor: pointer; font-size: 0.9rem; font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0,114,255,0.2);
         }
+        .btn-home:hover { background: var(--dark-blue); transform: translateY(-2px); }
 
         h1 { color: var(--primary); font-size: 1.8rem; margin: 10px 0; font-weight: 800; }
 
@@ -109,8 +101,9 @@
 
         .search-container input { 
             padding: 12px 15px; border: 2px solid #cbd5e1; border-radius: 10px; 
-            font-size: 16px; flex-grow: 1;
+            font-size: 16px; flex-grow: 1; outline: none;
         }
+        .search-container input:focus { border-color: var(--primary); }
 
         .search-container button {
             padding: 0 25px; height: 48px; background: linear-gradient(135deg, var(--primary), var(--accent));
@@ -138,20 +131,20 @@
     <div id="protected-content">
         <div class="main-container">
             <div class="header-box">
-                <button class="btn-logout" onclick="logout()">LOGOUT</button>
+                <button class="btn-home" onclick="goHome()">🏠 HOME</button>
                 <img src="https://i.ibb.co/PHHxChW/unnamed.jpg" alt="Logo Aeroclub Varese" style="width: 100px;">
                 <h1>Ricerca Database Quiz PPL</h1>
             </div>
 
             <div class="search-container">
-                <input type="text" id="searchText" placeholder="Parole chiave nel testo...">
-                <input type="text" id="searchId" placeholder="ID Domanda (es. 102)">
+                <input type="text" id="searchText" placeholder="Cerca parole chiave...">
+                <input type="text" id="searchId" placeholder="Cerca per ID">
                 <button onclick="handleSearch()">Cerca</button>
                 <button onclick="resetSearch()" style="background:#cbd5e1; color:#444;">Reset</button>
             </div>
 
             <div id="results">
-                <p style="text-align:center; color:#666;">Pronto per la ricerca...</p>
+                <p style="text-align:center; color:#666;">In attesa di ricerca...</p>
             </div>
         </div>
 
@@ -163,7 +156,6 @@
     <script>
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7nj9UrBloRfIDxZkRUkxBu1neSuPIyaR4EjBWj90BLyDK3VkOBeqZSxe2pb1jwkE7mIEelHXhzayP/pub?output=csv';
 
-        // Disabilita protezioni browser base
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('keydown', e => {
             if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I'))) e.preventDefault();
@@ -175,9 +167,7 @@
                 const response = await fetch(CSV_URL);
                 const csvText = await response.text();
                 quizData = parseCSV(csvText);
-            } catch (e) {
-                console.error("Errore caricamento database.");
-            }
+            } catch (e) { console.error("Errore database."); }
         }
 
         function parseCSV(csv) {
@@ -192,20 +182,14 @@
             const id = document.getElementById('searchId').value.trim().replace('#', '').toLowerCase();
             const resDiv = document.getElementById('results');
             resDiv.innerHTML = '';
-
             if (!txt && !id) return;
-
             const filtered = quizData.filter(row => {
                 const rowId = row[6] ? row[6].replace('#', '').trim().toLowerCase() : '';
                 const rowTxt = row[0] ? row[0].toLowerCase() : '';
                 return id ? rowId === id : rowTxt.includes(txt);
             });
-
-            if (filtered.length > 0) {
-                filtered.forEach(row => displayResult(row, resDiv));
-            } else {
-                resDiv.innerHTML = '<p style="text-align:center;">Nessun risultato trovato.</p>';
-            }
+            if (filtered.length > 0) { filtered.forEach(row => displayResult(row, resDiv)); }
+            else { resDiv.innerHTML = '<p style="text-align:center;">Nessun risultato trovato.</p>'; }
         }
 
         function resetSearch() {
@@ -218,7 +202,6 @@
             const correctIdx = parseInt(row[5], 10);
             const resDiv = document.createElement('div');
             resDiv.className = 'quiz-result';
-            
             let answersHtml = '<ul>';
             ['A', 'B', 'C', 'D'].forEach((label, i) => {
                 if (row[i+1]) {
@@ -227,7 +210,6 @@
                 }
             });
             answersHtml += '</ul>';
-
             resDiv.innerHTML = `
                 <div style="font-size:0.75rem; color:#f39c12; font-weight:bold;">${row[7] || 'PPL'}</div>
                 <h3 style="margin:5px 0; font-size:1rem; color:var(--primary);">ID #${row[6]}</h3>
