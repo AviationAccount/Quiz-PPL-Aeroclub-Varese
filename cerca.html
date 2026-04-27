@@ -3,9 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ricerca Domande Quiz PPL - Accesso Riservato</title>
+    <title>Ricerca Database Quiz PPL - Aeroclub Varese</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+    <script>
+        // CONFIGURAZIONE FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyDqy6CFoufHVlqT94GdurCMzcmPFv-VprM",
+            authDomain: "quiz-ppl-varese.firebaseapp.com",
+            projectId: "quiz-ppl-varese",
+            storageBucket: "quiz-ppl-varese.firebasestorage.app",
+            messagingSenderId: "784406293571",
+            appId: "1:784406293571:web:dd28c5574910502891b8f6"
+        };
+        
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        const auth = firebase.auth();
+        const LOGIN_URL = "https://aviationaccount.github.io/Quiz-PPL-Aeroclub-Varese/";
+        let quizData = []; 
+
+        // CONTROLLO ACCESSO (Auth Guard)
+        auth.onAuthStateChanged((user) => {
+            const content = document.getElementById('protected-content');
+            if (user) {
+                // Utente loggato: mostra la pagina e carica il CSV
+                if (content) content.style.display = 'block';
+                if (quizData.length === 0) loadCSV();
+            } else {
+                // Utente NON loggato: reindirizzamento forzato
+                window.location.replace(LOGIN_URL);
+            }
+        });
+
+        async function logout() {
+            try {
+                await auth.signOut();
+            } catch (error) {
+                window.location.replace(LOGIN_URL);
+            }
+        }
+    </script>
+
     <style>
-        /* --- VARIABILI PREMIUM --- */
         :root {
             --primary: #0072ff;
             --accent: #00d2ff;
@@ -18,312 +62,136 @@
             --gray-light: #f8fafc;
         }
 
-        /* --- RESET E BACKGROUND --- */
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(120deg, var(--dark-bg), var(--dark-blue));
             color: var(--white);
             margin: 0;
-            padding: 0;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            flex-direction: column;
-            padding-top: 40px;
-            padding-bottom: 40px;
         }
 
-        /* --- SCHERMATA DI LOGIN --- */
-        #loginScreen {
-            background-color: var(--white);
-            padding: 45px;
-            border-radius: 24px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-            text-align: center;
-            width: 100%;
-            max-width: 380px;
-            color: var(--text-dark);
-            margin: auto;
-            animation: zoomIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        /* Il contenuto parte nascosto per sicurezza */
+        #protected-content { 
+            display: none; 
+            padding: 40px 0; 
+            animation: fadeIn 0.8s ease;
         }
 
-        .login-logo {
-            width: 180px;
-            height: auto;
-            margin-bottom: 25px;
-            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        #loginScreen h2 {
-            color: var(--text-dark);
-            margin-bottom: 25px;
-            font-size: 1.6rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-
-        .login-input {
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            box-sizing: border-box;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            background-color: var(--gray-light);
-        }
-
-        .login-input:focus {
-            outline: none;
-            border-color: var(--accent);
-            background-color: var(--white);
-            box-shadow: 0 0 0 4px rgba(0, 210, 255, 0.15);
-        }
-
-        #loginButton {
-            width: 100%;
-            padding: 16px;
-            margin-top: 15px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: var(--white);
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(0, 114, 255, 0.3);
-        }
-
-        #loginButton:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(0, 210, 255, 0.4);
-            filter: brightness(1.1);
-        }
-
-        /* --- CONTENITORE PRINCIPALE (RICERCA) --- */
         .main-container {
             max-width: 1000px;
             width: 92%;
             background: rgba(255, 255, 255, 0.98);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
             padding: 40px;
-            display: none;
             box-sizing: border-box;
             color: var(--text-dark);
-            margin: 20px auto;
-            animation: zoomIn 0.8s forwards;
+            margin: 0 auto;
         }
 
-        h1 { 
-            color: var(--primary);
-            font-size: 2rem;
-            margin-bottom: 30px;
-            font-weight: 800;
-            text-align: center;
-            letter-spacing: -1px;
+        .header-box { text-align: center; margin-bottom: 30px; position: relative; }
+        
+        .btn-logout { 
+            position: absolute; top: 0; right: 0; background: #f1f5f9; 
+            border: 1px solid #ddd; padding: 8px 15px; border-radius: 8px; 
+            cursor: pointer; font-size: 0.8rem; font-weight: bold; color: var(--danger);
+            transition: all 0.3s;
         }
+        .btn-logout:hover { background: #fee2e2; border-color: var(--danger); }
 
-        /* --- AREA DI RICERCA --- */
+        h1 { color: var(--primary); font-size: 1.8rem; margin: 10px 0; font-weight: 800; letter-spacing: -1px; }
+
         .search-container { 
             background-color: var(--gray-light);
-            padding: 25px; 
-            border-radius: 16px; 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 15px;
-            border: 1px solid #e2e8f0;
-            margin-bottom: 30px;
+            padding: 25px; border-radius: 16px; display: flex; 
+            flex-wrap: wrap; gap: 15px; border: 1px solid #e2e8f0; margin-bottom: 30px;
         }
 
-        .search-container input[type="text"] { 
-            padding: 12px 15px; 
-            border: 2px solid #cbd5e1; 
-            border-radius: 10px; 
-            font-size: 16px; 
-            flex-grow: 1; 
-            min-width: 250px; 
-            transition: all 0.3s ease;
+        .search-container input { 
+            padding: 12px 15px; border: 2px solid #cbd5e1; border-radius: 10px; 
+            font-size: 16px; flex-grow: 1; transition: all 0.3s;
         }
-
-        .search-container input:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 114, 255, 0.1);
-        }
+        .search-container input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(0,114,255,0.1); }
 
         .search-container button {
-            padding: 0 30px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: var(--white);
-            font-weight: 700;
-            border-radius: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            padding: 0 25px; height: 48px; background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; transition: transform 0.2s;
         }
+        .search-container button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 
-        #resetButton { 
-            background: #f1f5f9;
-            color: #475569;
-            border: 1px solid #cbd5e1;
-        }
-
-        #resetButton:hover { 
-            background-color: #e2e8f0;
-            color: var(--danger);
-        }
-
-        /* --- RISULTATI --- */
         .quiz-result {
-            border: 1px solid #e2e8f0;
-            padding: 25px;
-            margin: 20px 0;
-            border-radius: 16px;
-            background-color: var(--white);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            transition: transform 0.2s ease;
+            border: 1px solid #e2e8f0; padding: 25px; margin: 20px 0; 
+            border-radius: 16px; background: white; text-align: left;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
         }
-
-        .quiz-result:hover { transform: scale(1.01); }
 
         .subject-tag {
-            background: linear-gradient(90deg, #f39c12, #e67e22);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            margin-bottom: 15px;
-            display: inline-block;
-        }
-
-        .quiz-result h3 { color: var(--primary); margin: 0 0 10px 0; font-size: 1.1rem; }
-        .quiz-result p { line-height: 1.6; color: #334155; }
-
-        .quiz-result ul { list-style: none; padding: 0; margin-top: 15px; }
-        .quiz-result li { 
-            margin-bottom: 10px; 
-            padding: 12px 15px; 
-            border-radius: 10px; 
-            background-color: #f8fafc;
-            border: 1px solid #f1f5f9;
-            color: #475569;
+            background: linear-gradient(90deg, #f39c12, #e67e22); color: white; padding: 4px 12px; 
+            border-radius: 6px; font-size: 0.75rem; font-weight: 800; margin-bottom: 10px; display: inline-block;
         }
 
         .correct-answer {
-            background-color: #ecfdf5 !important;
-            color: #065f46 !important;
-            border: 1px solid #10b981 !important;
-            font-weight: 600;
-            position: relative;
+            background-color: #ecfdf5 !important; color: #065f46 !important;
+            border: 1px solid #10b981 !important; font-weight: 600; padding: 12px; border-radius: 8px;
+            margin: 8px 0; position: relative;
         }
+        .correct-answer::after { content: "✓"; position: absolute; right: 15px; }
 
-        .correct-answer::after {
-            content: "✓";
-            position: absolute;
-            right: 15px;
-        }
+        ul { list-style: none; padding: 0; }
+        li { padding: 10px; color: #475569; border-bottom: 1px solid #f1f5f9; border-radius: 6px; }
 
-        /* --- COPYRIGHT --- */
-        #copyright {
-            margin: 30px auto;
-            font-size: 0.85rem;
-            color: #94a3b8;
-            text-align: center;
-            width: 90%;
-            max-width: 800px;
-            line-height: 1.5;
-        }
-
-        /* ANIMAZIONI */
-        @keyframes zoomIn {
-            from { transform: scale(0.95); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .main-container, #loginScreen, #copyright { align-self: center; }
-
+        footer { text-align: center; margin-top: 40px; font-size: 0.85rem; color: #94a3b8; padding-bottom: 40px; line-height: 1.6; }
     </style>
 </head>
 <body>
-    
-    <div id="loginScreen">
-        <img src="https://i.ibb.co/PHHxChW/unnamed.jpg" alt="Logo Aeroclub Varese" class="login-logo"/>
-        <h2>Database Quiz PPL</h2>
-        <input type="text" id="username" class="login-input" placeholder="Username">
-        <input type="password" id="password" class="login-input" placeholder="Password">
-        <button id="loginButton" onclick="handleLogin()">Accedi al Portale</button>
-        <p id="loginMessage" style="color: var(--danger); margin-top: 15px; font-size: 0.9rem; font-weight: 600;"></p>
-    </div>
 
-    <div class="main-container" id="mainContent">
-        <h1>Ricerca Domande Quiz PPL</h1>
-        
-        <div class="search-container">
-            <input type="text" id="searchText" placeholder="Cerca parole nel testo della domanda...">
-            <input type="text" id="searchId" placeholder="ID Domanda (es. 1001)">
-            <button onclick="handleSearch()">Cerca</button>
-            <button id="resetButton" onclick="resetSearch()">Reset</button>
+    <div id="protected-content">
+        <div class="main-container">
+            <div class="header-box">
+                <button class="btn-logout" onclick="logout()">LOGOUT</button>
+                <img src="https://i.ibb.co/PHHxChW/unnamed.jpg" alt="Logo Aeroclub Varese" style="width: 100px;">
+                <h1>Ricerca Database Quiz PPL</h1>
+            </div>
+
+            <div class="search-container">
+                <input type="text" id="searchText" placeholder="Cerca parole chiave nel testo...">
+                <input type="text" id="searchId" placeholder="Cerca per ID (es. 1001)">
+                <button onclick="handleSearch()">Cerca</button>
+                <button id="resetButton" onclick="resetSearch()" style="background:#cbd5e1; color:#444;">Reset</button>
+            </div>
+
+            <div id="results">
+                <p style="text-align:center; color:#666;">Caricamento database aeronautico...</p>
+            </div>
         </div>
 
-        <div id="results">
-            </div>
+        <footer>
+            © 2026 by A.D per <strong>Aeroclub di Varese</strong>. <br>
+            Tutti i diritti riservati. Contenuto protetto da copyright.
+        </footer>
     </div>
-
-    <footer id="copyright">
-        © 2026 by A.D per <strong>Aeroclub di Varese</strong>. <br>
-        Tutti i diritti riservati. Le informazioni e i contenuti sono protetti da copyright.
-    </footer>
 
     <script>
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7nj9UrBloRfIDxZkRUkxBu1neSuPIyaR4EjBWj90BLyDK3VkOBeqZSxe2pb1jwkE7mIEelHXhzayP/pub?output=csv';
-        let quizData = [];
 
-        // Protezione tasti e click destro
-        document.addEventListener('contextmenu', event => event.preventDefault());
-        document.addEventListener('keydown', event => {
-            if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && (event.key === 'I' || event.key === 'J'))) {
-                event.preventDefault();
-            }
+        // Disabilita tasto destro e F12 per protezione contenuti
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', e => {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J'))) e.preventDefault();
+            if (e.key === 'Enter') handleSearch();
         });
-
-        // Invio con tasto Enter
-        [document.getElementById('username'), document.getElementById('password')].forEach(el => {
-            el.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
-        });
-        
-        function handleLogin() {
-            const u = document.getElementById('username').value.trim();
-            const p = document.getElementById('password').value.trim();
-            const msg = document.getElementById('loginMessage');
-
-            if (u === 'allievo' && p === 'allievo') {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('mainContent').style.display = 'block';
-                loadCSV(); 
-            } else {
-                msg.textContent = 'Credenziali non valide. Riprova.';
-                document.getElementById('password').value = '';
-            }
-        }
 
         async function loadCSV() {
             const res = document.getElementById('results');
-            res.innerHTML = '<p style="text-align:center; color: var(--primary);">Inizializzazione database aeronautico...</p>';
             try {
                 const response = await fetch(CSV_URL);
                 const csvText = await response.text();
                 quizData = parseCSV(csvText);
-                res.innerHTML = `<p style="text-align:center; color: var(--success); font-weight:600;">Sistema Pronto. ${quizData.length} domande caricate.</p>`;
+                res.innerHTML = `<p style="text-align:center; color: var(--success); font-weight:bold;">Database Pronto: ${quizData.length} domande disponibili.</p>`;
             } catch (e) {
-                res.innerHTML = '<p class="error">Errore di connessione al database.</p>';
+                res.innerHTML = '<p style="text-align:center; color:var(--danger);">Errore critico nella connessione al database CSV.</p>';
             }
         }
 
@@ -351,14 +219,14 @@
             if (filtered.length > 0) {
                 filtered.forEach(row => displayResult(row, resDiv));
             } else {
-                resDiv.innerHTML = '<p style="text-align:center;">Nessun risultato trovato.</p>';
+                resDiv.innerHTML = '<p style="text-align:center;">Nessuna domanda corrispondente trovata.</p>';
             }
         }
 
         function resetSearch() {
             document.getElementById('searchText').value = '';
             document.getElementById('searchId').value = '';
-            document.getElementById('results').innerHTML = `<p style="text-align:center; color: var(--success);">Database pronto per una nuova ricerca.</p>`;
+            document.getElementById('results').innerHTML = '<p style="text-align:center;">Database pronto per una nuova ricerca.</p>';
         }
 
         function displayResult(row, container) {
@@ -376,17 +244,13 @@
             answersHtml += '</ul>';
 
             resDiv.innerHTML = `
-                <div class="subject-tag">${row[7] || 'Generale'}</div>
-                <h3>ID Domanda: #${row[6]}</h3>
-                <p><strong>Domanda:</strong> ${row[0]}</p>
+                <div class="subject-tag">${row[7] || 'PPL GENERALE'}</div>
+                <h3 style="margin:0 0 10px 0; font-size:1.1rem; color:var(--primary);">ID Domanda: #${row[6]}</h3>
+                <p style="margin-bottom:15px; font-weight:500; line-height:1.5;">${row[0]}</p>
                 ${answersHtml}
             `;
             container.appendChild(resDiv);
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('mainContent').style.display = 'none';
-        });
     </script>
 </body>
 </html>
