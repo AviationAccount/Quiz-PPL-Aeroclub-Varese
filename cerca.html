@@ -27,15 +27,18 @@
         const LOGIN_URL = "https://aviationaccount.github.io/Quiz-PPL-Aeroclub-Varese/";
         let quizData = []; 
 
-        // CONTROLLO ACCESSO (Auth Guard)
+        /**
+         * LA TUA NUOVA BARRIERA DI SICUREZZA
+         * Sostituisce ogni vecchio sistema di password.
+         */
         auth.onAuthStateChanged((user) => {
             const content = document.getElementById('protected-content');
             if (user) {
-                // Utente loggato: mostra la pagina e carica il CSV
+                // Se l'utente è loggato con Firebase (da index.html), mostriamo tutto
                 if (content) content.style.display = 'block';
                 if (quizData.length === 0) loadCSV();
             } else {
-                // Utente NON loggato: reindirizzamento forzato
+                // Se NON è loggato, la pagina resta bianca e torna al login
                 window.location.replace(LOGIN_URL);
             }
         });
@@ -70,14 +73,11 @@
             min-height: 100vh;
         }
 
-        /* Il contenuto parte nascosto per sicurezza */
+        /* La pagina nasce "invisibile" per evitare che si veda il contenuto prima del controllo Firebase */
         #protected-content { 
             display: none; 
             padding: 40px 0; 
-            animation: fadeIn 0.8s ease;
         }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .main-container {
             max-width: 1000px;
@@ -97,11 +97,9 @@
             position: absolute; top: 0; right: 0; background: #f1f5f9; 
             border: 1px solid #ddd; padding: 8px 15px; border-radius: 8px; 
             cursor: pointer; font-size: 0.8rem; font-weight: bold; color: var(--danger);
-            transition: all 0.3s;
         }
-        .btn-logout:hover { background: #fee2e2; border-color: var(--danger); }
 
-        h1 { color: var(--primary); font-size: 1.8rem; margin: 10px 0; font-weight: 800; letter-spacing: -1px; }
+        h1 { color: var(--primary); font-size: 1.8rem; margin: 10px 0; font-weight: 800; }
 
         .search-container { 
             background-color: var(--gray-light);
@@ -111,38 +109,28 @@
 
         .search-container input { 
             padding: 12px 15px; border: 2px solid #cbd5e1; border-radius: 10px; 
-            font-size: 16px; flex-grow: 1; transition: all 0.3s;
+            font-size: 16px; flex-grow: 1;
         }
-        .search-container input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(0,114,255,0.1); }
 
         .search-container button {
             padding: 0 25px; height: 48px; background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; transition: transform 0.2s;
+            color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer;
         }
-        .search-container button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 
         .quiz-result {
             border: 1px solid #e2e8f0; padding: 25px; margin: 20px 0; 
             border-radius: 16px; background: white; text-align: left;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-        }
-
-        .subject-tag {
-            background: linear-gradient(90deg, #f39c12, #e67e22); color: white; padding: 4px 12px; 
-            border-radius: 6px; font-size: 0.75rem; font-weight: 800; margin-bottom: 10px; display: inline-block;
         }
 
         .correct-answer {
             background-color: #ecfdf5 !important; color: #065f46 !important;
-            border: 1px solid #10b981 !important; font-weight: 600; padding: 12px; border-radius: 8px;
-            margin: 8px 0; position: relative;
+            border: 1px solid #10b981 !important; font-weight: 600; padding: 10px; border-radius: 8px;
         }
-        .correct-answer::after { content: "✓"; position: absolute; right: 15px; }
 
         ul { list-style: none; padding: 0; }
-        li { padding: 10px; color: #475569; border-bottom: 1px solid #f1f5f9; border-radius: 6px; }
+        li { padding: 8px 0; color: #475569; border-bottom: 1px solid #f1f5f9; }
 
-        footer { text-align: center; margin-top: 40px; font-size: 0.85rem; color: #94a3b8; padding-bottom: 40px; line-height: 1.6; }
+        footer { text-align: center; margin-top: 40px; font-size: 0.8rem; color: #94a3b8; padding-bottom: 40px; }
     </style>
 </head>
 <body>
@@ -156,42 +144,39 @@
             </div>
 
             <div class="search-container">
-                <input type="text" id="searchText" placeholder="Cerca parole chiave nel testo...">
-                <input type="text" id="searchId" placeholder="Cerca per ID (es. 1001)">
+                <input type="text" id="searchText" placeholder="Parole chiave nel testo...">
+                <input type="text" id="searchId" placeholder="ID Domanda (es. 102)">
                 <button onclick="handleSearch()">Cerca</button>
-                <button id="resetButton" onclick="resetSearch()" style="background:#cbd5e1; color:#444;">Reset</button>
+                <button onclick="resetSearch()" style="background:#cbd5e1; color:#444;">Reset</button>
             </div>
 
             <div id="results">
-                <p style="text-align:center; color:#666;">Caricamento database aeronautico...</p>
+                <p style="text-align:center; color:#666;">Pronto per la ricerca...</p>
             </div>
         </div>
 
         <footer>
-            © 2026 by A.D per <strong>Aeroclub di Varese</strong>. <br>
-            Tutti i diritti riservati. Contenuto protetto da copyright.
+            © 2026 by A.D per Aeroclub di Varese. <br> Accesso riservato agli allievi autorizzati.
         </footer>
     </div>
 
     <script>
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7nj9UrBloRfIDxZkRUkxBu1neSuPIyaR4EjBWj90BLyDK3VkOBeqZSxe2pb1jwkE7mIEelHXhzayP/pub?output=csv';
 
-        // Disabilita tasto destro e F12 per protezione contenuti
+        // Disabilita protezioni browser base
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('keydown', e => {
-            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J'))) e.preventDefault();
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I'))) e.preventDefault();
             if (e.key === 'Enter') handleSearch();
         });
 
         async function loadCSV() {
-            const res = document.getElementById('results');
             try {
                 const response = await fetch(CSV_URL);
                 const csvText = await response.text();
                 quizData = parseCSV(csvText);
-                res.innerHTML = `<p style="text-align:center; color: var(--success); font-weight:bold;">Database Pronto: ${quizData.length} domande disponibili.</p>`;
             } catch (e) {
-                res.innerHTML = '<p style="text-align:center; color:var(--danger);">Errore critico nella connessione al database CSV.</p>';
+                console.error("Errore caricamento database.");
             }
         }
 
@@ -219,14 +204,14 @@
             if (filtered.length > 0) {
                 filtered.forEach(row => displayResult(row, resDiv));
             } else {
-                resDiv.innerHTML = '<p style="text-align:center;">Nessuna domanda corrispondente trovata.</p>';
+                resDiv.innerHTML = '<p style="text-align:center;">Nessun risultato trovato.</p>';
             }
         }
 
         function resetSearch() {
             document.getElementById('searchText').value = '';
             document.getElementById('searchId').value = '';
-            document.getElementById('results').innerHTML = '<p style="text-align:center;">Database pronto per una nuova ricerca.</p>';
+            document.getElementById('results').innerHTML = '<p style="text-align:center;">Pronto per nuova ricerca.</p>';
         }
 
         function displayResult(row, container) {
@@ -244,9 +229,9 @@
             answersHtml += '</ul>';
 
             resDiv.innerHTML = `
-                <div class="subject-tag">${row[7] || 'PPL GENERALE'}</div>
-                <h3 style="margin:0 0 10px 0; font-size:1.1rem; color:var(--primary);">ID Domanda: #${row[6]}</h3>
-                <p style="margin-bottom:15px; font-weight:500; line-height:1.5;">${row[0]}</p>
+                <div style="font-size:0.75rem; color:#f39c12; font-weight:bold;">${row[7] || 'PPL'}</div>
+                <h3 style="margin:5px 0; font-size:1rem; color:var(--primary);">ID #${row[6]}</h3>
+                <p style="margin-bottom:10px;">${row[0]}</p>
                 ${answersHtml}
             `;
             container.appendChild(resDiv);
