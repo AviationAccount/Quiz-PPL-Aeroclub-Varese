@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recupero Password - Aeroclub Varese</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <style>
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: linear-gradient(135deg, #001f3f 0%, #003366 100%); 
+            display: flex; justify-content: center; align-items: center; 
+            height: 100vh; margin: 0; color: white;
+        }
+        .container {
+            background: white; padding: 30px; border-radius: 20px;
+            width: 90%; max-width: 400px; text-align: center; color: #333;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+        input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { 
+            width: 100%; padding: 14px; background: #003366; color: white; 
+            border: none; border-radius: 8px; cursor: pointer; font-weight: bold; 
+        }
+        .back-link { display: block; margin-top: 15px; color: #003366; text-decoration: none; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 style="color: #003366; margin-bottom: 10px;">Recupero Password</h2>
+    <p style="font-size: 0.9em; color: #666;">Inserisci la tua email per ricevere il link di reset.</p>
+    
+    <input type="email" id="email-recupero" placeholder="La tua email / Your email">
+    <button onclick="sendReset()">Invia Link / Send Reset Link</button>
+    
+    <a href="index.html" class="back-link">← Torna al Login</a>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDqy6CFoufHVlqT94GdurCMzcmPFv-VprM",
+        authDomain: "quiz-ppl-varese.firebaseapp.com",
+        projectId: "quiz-ppl-varese",
+        storageBucket: "quiz-ppl-varese.firebasestorage.app",
+        messagingSenderId: "784406293571",
+        appId: "1:784406293571:web:dd28c5574910502891b8f6"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    async function sendReset() {
+        const email = document.getElementById('email-recupero').value.trim();
+        if (!email) {
+            alert("Inserisci un'email valida.");
+            return;
+        }
+
+        try {
+            await firebase.auth().sendPasswordResetEmail(email);
+            alert("Email inviata con successo! Controlla la tua posta.");
+            window.location.href = "index.html"; // Torna al login dopo l'invio
+        } catch (error) {
+            alert("Errore: " + error.message);
+        }
+    }
+</script>
+
+</body>
+</html>
