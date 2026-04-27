@@ -8,34 +8,75 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <style>
         body { 
-            font-family: 'Segoe UI', sans-serif; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
             background: linear-gradient(135deg, #001f3f 0%, #003366 100%); 
             display: flex; justify-content: center; align-items: center; 
-            height: 100vh; margin: 0; color: white;
+            min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box;
         }
         .container {
-            background: white; padding: 30px; border-radius: 20px;
-            width: 90%; max-width: 400px; text-align: center; color: #333;
+            background: rgba(255, 255, 255, 0.95); padding: 35px; border-radius: 20px;
+            width: 100%; max-width: 400px; text-align: center; color: #333;
             box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            animation: fadeIn 0.6s ease-out;
         }
-        input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        h2 { color: #003366; margin-top: 0; }
+        input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1em; }
         button { 
             width: 100%; padding: 14px; background: #003366; color: white; 
-            border: none; border-radius: 8px; cursor: pointer; font-weight: bold; 
+            border: none; border-radius: 8px; cursor: pointer; font-weight: bold; text-transform: uppercase;
+            transition: background 0.3s;
         }
-        .back-link { display: block; margin-top: 15px; color: #003366; text-decoration: none; font-size: 0.9em; }
+        button:hover { background: #004080; }
+        .back-link { display: block; margin-top: 15px; color: #003366; text-decoration: none; font-size: 0.9em; font-weight: 500; }
+
+        /* STILE MODAL */
+        #custom-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0, 31, 63, 0.98); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(8px);
+        }
+        .modal-content { 
+            background: white; padding: 35px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .icon-check { font-size: 50px; color: #10b981; margin-bottom: 15px; }
+        .spam-alert { 
+            background: #fff4e5; border-left: 5px solid #ff9800; padding: 15px; 
+            margin: 20px 0; text-align: left; border-radius: 8px;
+        }
     </style>
 </head>
 <body>
 
+<div id="custom-modal">
+    <div class="modal-content">
+        <div class="icon-check">✉️</div>
+        <h2 style="color: #003366; margin-bottom: 5px;">Email Inviata!</h2>
+        <p style="color: #666; font-size: 0.9em; margin-top: 0;">Email Sent Successfully!</p>
+        
+        <div class="spam-alert">
+            <p style="margin: 0; font-size: 0.9em; color: #856404; line-height: 1.4;">
+                <strong>IMPORTANTE:</strong> Controlla la cartella <strong>SPAM</strong> o Posta Indesiderata.<br>
+                <span style="font-style: italic; font-size: 0.85em;">Check your <strong>SPAM</strong> or Junk folder.</span>
+            </p>
+        </div>
+
+        <button onclick="window.location.href='index.html'">Torna al Login / Back to Login</button>
+    </div>
+</div>
+
 <div class="container">
-    <h2 style="color: #003366; margin-bottom: 10px;">Recupero Password</h2>
-    <p style="font-size: 0.9em; color: #666;">Inserisci la tua email per ricevere il link di reset.</p>
+    <h2 style="color: #003366; margin-bottom: 5px;">Recupero Password</h2>
+    <p style="font-size: 0.85em; color: #666; margin-bottom: 20px;">
+        Inserisci la tua email per ricevere il link di reset.<br>
+        <i>Enter your email to receive the reset link.</i>
+    </p>
     
     <input type="email" id="email-recupero" placeholder="La tua email / Your email">
-    <button onclick="sendReset()">Invia Link / Send Reset Link</button>
+    <button id="submit-btn" onclick="sendReset()">Invia Link / Send Reset Link</button>
     
-    <a href="index.html" class="back-link">← Torna al Login</a>
+    <a href="index.html" class="back-link">← Torna al Login / Back to Login</a>
 </div>
 
 <script>
@@ -50,18 +91,32 @@
     firebase.initializeApp(firebaseConfig);
 
     async function sendReset() {
-        const email = document.getElementById('email-recupero').value.trim();
-        if (!email) {
-            alert("Inserisci un'email valida.");
+        const emailInput = document.getElementById('email-recupero');
+        const email = emailInput.value.trim();
+        const btn = document.getElementById('submit-btn');
+
+        if (!email || !email.includes("@")) {
+            alert("Per favore, inserisci un indirizzo email valido.\nPlease enter a valid email address.");
             return;
         }
 
+        // Disabilita il tasto per evitare click multipli
+        btn.disabled = true;
+        btn.innerText = "Invio in corso... / Sending...";
+
         try {
             await firebase.auth().sendPasswordResetEmail(email);
-            alert("Email inviata con successo! Controlla la tua posta.");
-            window.location.href = "index.html"; // Torna al login dopo l'invio
+            // Mostra il modal personalizzato
+            document.getElementById('custom-modal').style.display = 'flex';
         } catch (error) {
-            alert("Errore: " + error.message);
+            btn.disabled = false;
+            btn.innerText = "Invia Link / Send Reset Link";
+            
+            if (error.code === 'auth/user-not-found') {
+                alert("Email non trovata nel sistema.\nEmail not found.");
+            } else {
+                alert("Errore / Error: " + error.message);
+            }
         }
     }
 </script>
