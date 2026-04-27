@@ -767,6 +767,7 @@ body {
          onmouseover="this.style.transform='scale(1.2)'" 
          onmouseout="this.style.transform='scale(1)'">
 </div>
+
     <div id="login" class="login-container">
         <div class="login-box">
             <img src="https://i.ibb.co/7d1dv94j/Senza-titolo-2.jpg alt="Logo sito quiz ppl"/>
@@ -774,6 +775,11 @@ body {
             <input type="text" id="username" placeholder="Email" />
             <input type="password" id="password" placeholder="Password" />
             <button onclick="login()">Accedi</button>
+<p style="margin-top: 10px; margin-bottom: 5px; font-size: 0.85em;">
+    <a href="https://aviationaccount.github.io/Quiz-PPL-Aeroclub-Varese/recupero.html" style="color: #666; text-decoration: none; font-weight: 500;">
+        Password dimenticata? / Forgot password?
+    </a>
+</p>
             <div id="error-message" class="error-message">Username o password errati</div>
         </div>
         <div style="text-align: center; margin-top: 25px; font-family: 'Inter', sans-serif; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
@@ -793,8 +799,6 @@ body {
     </p>
 </div>
     </div>
-    
-
     <div id="quiz-section" class="quiz-container" style="display: none;">
         <div class="download-section">
             <a href="https://drive.google.com/file/d/1Q_-1z_xR2OjHL8st6d3wFzQWgWHZVSCZ/view?usp=drive_link">
@@ -1578,7 +1582,7 @@ function resetQuiz() {
 const dictionary = {
     it: {
         loginTitle: "Login",
-        userPh: "Username",
+        userPh: "Email",
         passPh: "Password",
         loginBtn: "Accedi",
         errorMsg: "Username o password errati",
@@ -1595,7 +1599,7 @@ const dictionary = {
     },
     en: {
         loginTitle: "Login",
-        userPh: "Username",
+        userPh: "Email",
         passPh: "Password",
         loginBtn: "Sign In",
         errorMsg: "Invalid username or password",
@@ -1651,5 +1655,103 @@ function translateUI(lang) {
     ">
         © 2025 by A.D per Aeroclub di Varese. Tutti i diritti riservati. Le informazioni e i contenuti di questo quiz sono protetti da copyright. - IP monitorati per scopi di sicurezza - .
     </footer>
+    <script>
+    // 1. CONFIGURAZIONE FIREBASE (Usa le tue credenziali)
+    const firebaseConfig = {
+        apiKey: "AIzaSyDqy6CFoufHVlqT94GdurCMzcmPFv-VprM",
+        authDomain: "quiz-ppl-varese.firebaseapp.com",
+        projectId: "quiz-ppl-varese",
+        storageBucket: "quiz-ppl-varese.firebasestorage.app",
+        messagingSenderId: "784406293571",
+        appId: "1:784406293571:web:dd28c5574910502891b8f6"
+    };
+    
+    // Inizializza Firebase
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+
+    // 2. LOGICA DI LOGIN
+    async function login() {
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const errorDiv = document.getElementById('error-message');
+
+        if (!email || !password) {
+            errorDiv.innerText = "Inserisci email e password.";
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        try {
+            await auth.signInWithEmailAndPassword(email, password);
+            // Reindirizza alla dashboard o ai quiz dopo il login
+            window.location.href = "dashboard.html"; 
+        } catch (error) {
+            console.error("Errore login:", error);
+            errorDiv.style.display = 'block';
+            errorDiv.innerText = "Email o password errati.";
+        }
+    }
+
+    // 3. RECUPERO PASSWORD
+    async function forgotPassword() {
+        const email = document.getElementById('email').value.trim();
+
+        if (!email || !email.includes("@")) {
+            alert("Inserisci un'email valida nel campo sopra per resettare la password.");
+            return;
+        }
+
+        try {
+            await auth.sendPasswordResetEmail(email);
+            alert("Email di reset inviata! Controlla la tua posta.");
+        } catch (error) {
+            alert("Errore: " + error.message);
+        }
+    }
+
+    // 4. SISTEMA DI TRADUZIONE
+    const translations = {
+        it: {
+            login_title: "Login",
+            btn_login: "Accedi",
+            forgot_password: "Password dimenticata? / Forgot password?",
+            placeholder_email: "Email",
+            placeholder_pass: "Password"
+        },
+        en: {
+            login_title: "Sign In",
+            btn_login: "Login",
+            forgot_password: "Forgot password?",
+            placeholder_email: "Your Email",
+            placeholder_pass: "Your Password"
+        }
+    };
+
+    function translateUI(lang) {
+        // Traduzione testi
+        document.querySelector('h2').innerText = translations[lang].login_title;
+        document.querySelector('button').innerText = translations[lang].btn_login;
+        
+        // Traduzione link password dimenticata
+        const forgotLink = document.querySelector('a[onclick="forgotPassword()"]');
+        if(forgotLink) forgotLink.innerText = translations[lang].forgot_password;
+
+        // Traduzione Placeholders
+        document.getElementById('email').placeholder = translations[lang].placeholder_email;
+        document.getElementById('password').placeholder = translations[lang].placeholder_pass;
+        
+        // Salva lingua
+        localStorage.setItem('prefLang', lang);
+    }
+
+    // Carica lingua salvata all'avvio
+    window.onload = () => {
+        const savedLang = localStorage.getItem('prefLang') || 'it';
+        translateUI(savedLang);
+    };
+</script>
 </body>
 </html>
