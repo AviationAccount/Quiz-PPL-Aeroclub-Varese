@@ -23,8 +23,7 @@
         }
 
         const auth = firebase.auth();
-        // URL della tua pagina principale su GitHub
-        const HOME_URL = "https://aviationaccount.github.io/Quiz-PPL-Aeroclub-Varese/index.html";
+        const LOGIN_URL = "https://aviationaccount.github.io/Quiz-PPL-Aeroclub-Varese/index.html";
         let quizData = []; 
 
         auth.onAuthStateChanged((user) => {
@@ -33,13 +32,17 @@
                 if (content) content.style.display = 'block';
                 if (quizData.length === 0) loadCSV();
             } else {
-                window.location.replace(HOME_URL);
+                window.location.replace(LOGIN_URL);
             }
         });
 
-        // Semplice funzione di navigazione
-        function goHome() {
-            window.location.href = HOME_URL;
+        // Funzione per chiudere la finestra
+        function closeWindow() {
+            window.close();
+            // Fallback se il browser blocca window.close()
+            setTimeout(() => {
+                window.location.href = LOGIN_URL;
+            }, 500);
         }
     </script>
 
@@ -49,7 +52,7 @@
             --accent: #00d2ff;
             --dark-bg: #141E30;
             --dark-blue: #243B55;
-            --success: #28a745;
+            --danger: #dc3545;
             --white: #ffffff;
             --text-dark: #1e293b;
             --gray-light: #f8fafc;
@@ -79,17 +82,24 @@
 
         .header-box { text-align: center; margin-bottom: 30px; position: relative; }
         
-        /* Nuovo stile pulsante HOME */
-        .btn-home { 
+        /* Stile pulsante CHIUDI */
+        .btn-close { 
             position: absolute; top: 0; left: 0; 
-            background: var(--primary); 
+            background: var(--danger); 
             color: white; border: none; 
             padding: 10px 18px; border-radius: 12px; 
             cursor: pointer; font-size: 0.9rem; font-weight: bold;
             transition: all 0.3s;
-            box-shadow: 0 4px 10px rgba(0,114,255,0.2);
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.2);
         }
-        .btn-home:hover { background: var(--dark-blue); transform: translateY(-2px); }
+        .btn-close:hover { background: #b02a37; transform: translateY(-2px); }
+
+        .search-icon {
+            width: 60px;
+            height: 60px;
+            fill: var(--primary);
+            margin-bottom: 10px;
+        }
 
         h1 { color: var(--primary); font-size: 1.8rem; margin: 10px 0; font-weight: 800; }
 
@@ -131,13 +141,17 @@
     <div id="protected-content">
         <div class="main-container">
             <div class="header-box">
-                <button class="btn-home" onclick="goHome()">🏠 HOME</button>
-                <img src="https://i.ibb.co/PHHxChW/unnamed.jpg" alt="Logo Aeroclub Varese" style="width: 100px;">
-                <h1>Ricerca Database Quiz PPL</h1>
+                <button class="btn-close" onclick="closeWindow()">✖ CHIUDI</button>
+                
+                <svg class="search-icon" viewBox="0 0 24 24">
+                    <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+                
+                <h1>Ricerca Database Quiz</h1>
             </div>
 
             <div class="search-container">
-                <input type="text" id="searchText" placeholder="Cerca parole chiave...">
+                <input type="text" id="searchText" placeholder="Parole chiave nel testo...">
                 <input type="text" id="searchId" placeholder="Cerca per ID">
                 <button onclick="handleSearch()">Cerca</button>
                 <button onclick="resetSearch()" style="background:#cbd5e1; color:#444;">Reset</button>
