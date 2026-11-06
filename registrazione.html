@@ -3,33 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creazione Account Aeroclub Varese Quiz</title>
+    <title>Creazione Account - Quiz PPL Aeroclub Varese</title>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <style>
+        /* Quiz PPL - Aeroclub Varese
+           Stile unificato coerente con index.html */
+
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
+        :root {
+            --page: #0a2a4a;         /* blu notte, sfondo pagina */
+            --paper: #ffffff;
+            --paper-2: #f3f6f9;
+            --ink: #14202e;
+            --muted: #5d6b7b;
+            --line: #d3dae2;
+            --primary: #0f4c81;       /* blu aeronautico */
+            --primary-dark: #0a3860;
+            --accent: #f0a202;        /* giallo segnale */
+            --success: #1f7a52;
+            --success-bg: #e6f3ec;
+            --danger: #b3261e;
+            --danger-bg: #fbebea;
+            --warning: #f0a202;
+            --text-main: #ffffff;
+            --text-muted: #9fb3c8;
+        }
+
+        * { box-sizing: border-box; }
+
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
             width: 100%;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+            font-size: 16px;
+            line-height: 1.45;
+            background: var(--page);
+            color: var(--ink);
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
         }
 
-        /* SFONDO SFOCATO CON IL NUOVO LINK */
+        /* SFONDO SFOCATO */
         .background-blur {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(rgba(0, 31, 63, 0.75), rgba(0, 31, 63, 0.75)), 
+            background: linear-gradient(rgba(10, 42, 74, 0.85), rgba(10, 42, 74, 0.85)), 
                         url('https://i.ibb.co/nqvwwYNv/Senza-titolo-2.jpg'); 
             background-size: cover;
             background-position: center;
@@ -39,80 +69,135 @@
         }
 
         .reg-container { 
-            background: rgba(255, 255, 255, 0.96); 
-            border-radius: 30px; 
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5); 
-            width: 90%;
-            max-width: 450px; 
-            text-align: center; 
-            padding: 40px 30px;
-            animation: fadeIn 0.8s ease-out;
+            background: var(--paper); 
+            border-radius: 6px; 
+            border: 1px solid var(--line);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3); 
+            width: 92%;
+            max-width: 420px; 
+            text-align: left; 
+            padding: 28px 32px 24px;
+            animation: appear 0.25s ease-out;
             position: relative;
             z-index: 1;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes appear { from { opacity: 0; } to { opacity: 1; } }
 
         /* LOGO SOPRA IL FORM */
         .logo-header {
-            width: 150px; 
+            display: block;
+            width: 160px; 
+            max-width: 100%;
             height: auto;
-            margin-bottom: 15px;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+            margin: 0 auto 14px;
         }
 
-        h2 { color: #001f3f; margin: 0; font-size: 1.7em; font-weight: 800; }
-        .subtitle { font-size: 0.9em; color: #555; margin-bottom: 25px; display: block; }
+        h2 { 
+            color: var(--ink); 
+            margin: 0 0 4px; 
+            font-size: 1.25rem; 
+            font-weight: 600; 
+            text-align: center;
+        }
+        
+        .subtitle { 
+            font-size: 0.85rem; 
+            color: var(--muted); 
+            margin-bottom: 20px; 
+            display: block; 
+            text-align: center;
+        }
 
         input { 
+            display: block;
             width: 100%; 
-            padding: 14px 20px; 
-            margin: 8px 0; 
-            border: 1.5px solid #ddd; 
-            border-radius: 50px; 
-            box-sizing: border-box; 
-            font-size: 1em;
+            margin: 0 0 10px; 
+            padding: 11px 12px; 
+            border: 1px solid #aeb9c6; 
+            border-radius: 4px; 
+            background: #fff; 
+            color: var(--ink);
+            font-size: 1rem;
             outline: none;
-            transition: all 0.3s ease;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            font-family: inherit;
         }
 
-        input:focus { border-color: #001f3f; box-shadow: 0 0 8px rgba(0,31,63,0.2); }
+        input:focus { 
+            border-color: var(--primary); 
+            outline: 2px solid rgba(15, 76, 129, 0.25); 
+            outline-offset: 0; 
+        }
 
         button { 
             width: 100%; 
-            padding: 16px; 
-            background: #001f3f; 
-            color: white; 
+            margin-top: 6px; 
+            padding: 12px; 
+            background: var(--primary); 
+            color: #fff; 
             border: none; 
-            border-radius: 50px; 
+            border-radius: 4px; 
+            font-size: 1rem; 
+            font-weight: 600; 
             cursor: pointer; 
-            font-weight: bold; 
-            font-size: 1.1em;
-            text-transform: uppercase; 
-            margin-top: 20px; 
-            transition: transform 0.2s, background 0.3s;
+            transition: background 0.2s;
+            font-family: inherit;
         }
 
-        button:hover { background: #003366; transform: translateY(-2px); }
+        button:hover { background: var(--primary-dark); }
 
         .back-link { 
             display: block; 
-            margin-top: 20px; 
-            font-size: 0.95em; 
-            color: #001f3f; 
+            margin-top: 16px; 
+            font-size: 0.9rem; 
+            color: var(--primary) !important; 
             text-decoration: none; 
             font-weight: 500;
+            text-align: center;
         }
+        .back-link:hover { text-decoration: underline; }
 
         /* MODAL SUCCESSO */
         #success-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0, 31, 63, 0.95); z-index: 9999; justify-content: center; align-items: center;
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(6, 20, 36, 0.8); 
+            z-index: 9999; 
+            justify-content: center; 
+            align-items: center;
+            padding: 16px;
         }
-        .modal-content { background: white; padding: 40px; border-radius: 30px; width: 85%; max-width: 400px; text-align: center; }
-        .creds-box { background: #f8fafc; padding: 20px; border-radius: 15px; margin: 20px 0; text-align: left; border-left: 6px solid #001f3f; }
-        .label { font-size: 0.75em; color: #64748b; text-transform: uppercase; font-weight: bold; }
-        .value { font-size: 1.1em; color: #1e293b; font-weight: bold; margin-bottom: 10px; word-break: break-all; }
+        .modal-content { 
+            background: var(--paper); 
+            padding: 28px; 
+            border-radius: 6px; 
+            width: 100%; 
+            max-width: 400px; 
+            text-align: left;
+            border-top: 4px solid var(--success);
+        }
+        .modal-content h2 { text-align: left; margin-bottom: 8px; }
+        .creds-box { 
+            background: var(--paper-2); 
+            padding: 14px 16px; 
+            border-radius: 4px; 
+            margin: 16px 0; 
+            border: 1px solid var(--line);
+            border-left: 4px solid var(--primary); 
+        }
+        .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+        .value { font-size: 1rem; color: var(--ink); font-weight: 600; margin-bottom: 8px; word-break: break-all; }
+        
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+        @media (max-width: 640px) {
+            .reg-container { padding: 20px 18px; width: 96%; }
+        }
     </style>
 </head>
 <body>
@@ -121,8 +206,8 @@
 
 <div id="success-modal">
     <div class="modal-content">
-        <h2 style="color: #10b981;">✅ Registrazione OK!</h2>
-        <p>Salva le tue credenziali:</p>
+        <h2 style="color: var(--success); display: flex; align-items: center; gap: 8px;">✅ Registrazione OK!</h2>
+        <p style="color: var(--muted); font-size: 0.9rem; margin-top: 0;">Salva le tue credenziali di accesso:</p>
         <div class="creds-box">
             <p class="label">Email</p>
             <p id="display-email" class="value"></p>
@@ -169,7 +254,7 @@
         const password = document.getElementById('password').value;
 
         if(!nome || !cognome || !emailReale || !corsoValue || password.length < 6) {
-            alert("Compila tutti i campi correttamente.");
+            alert("Compila tutti i campi correttamente (la password deve essere di almeno 6 caratteri).");
             return;
         }
 
